@@ -179,7 +179,7 @@ export default function SolicitudesList() {
                         const esEnValidacion = solicitud.estado === "En validación";
 
                         return (
-                            <div key={solicitud.id} className="solicitud-card">
+                            <div key={solicitud.id} className="solicitud-card" onClick={() => navigate(`/solicitudes/${solicitud.id}`)}>
                                 <div className="solicitud-header">
                                     <span className="solicitud-id">
                                         ID: {solicitud.id}
@@ -213,7 +213,7 @@ export default function SolicitudesList() {
                                     )}
                                 </div>
 
-                                <div className="solicitud-actions">
+                                <div className="solicitud-actions" onClick={(e) => e.stopPropagation()}>
                                     {/* Botón Editar - Solo para Borrador */}
                                     <button
                                         className="btn-edit"

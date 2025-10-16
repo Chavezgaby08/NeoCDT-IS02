@@ -1475,3 +1475,23 @@ select:focus {
     width: 100%;
   }
 }
+
+.solicitud-card {
+  /* ... tus estilos existentes ... */
+  cursor: pointer;
+  /* Agregar esta línea */
+}
+
+.solicitud-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Evitar que los botones activen el click del card */
+.solicitud-actions {
+  pointer-events: all;
+}
+
+.solicitud-actions button {
+  pointer-events: all;
+}
