@@ -1,6 +1,6 @@
 let solicitudesMock = [
-    { id: 1, monto: 5000000, plazo: 180, estado: "Borrador" },
-    { id: 2, monto: 3000000, plazo: 90, estado: "Aprobada" },
+    { id: 1, monto: 5000000, plazo: 180, estado: "Aprobada" },
+    { id: 2, monto: 3000000, plazo: 90, estado: "En validación" },
 ];
 
 export const getSolicitudes = async () => {
@@ -23,3 +23,4 @@ export const deleteSolicitud = async (id) => {
     solicitudesMock = solicitudesMock.filter(s => s.id !== id);
     return true;
 };
+

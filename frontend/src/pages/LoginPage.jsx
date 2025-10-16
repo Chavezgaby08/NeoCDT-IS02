@@ -7,39 +7,79 @@ export default function LoginPage() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        const res = await login(username, password);
-        if (res.success) {
-            navigate("/dashboard");
-        } else {
-            setError(res.message);
+        setError("");
+        setLoading(true);
+
+        try {
+            const res = await login(username, password);
+            if (res.success) {
+                navigate("/dashboard");
+            } else {
+                setError(res.message || "Credenciales incorrectas");
+            }
+        } catch (err) {
+            setError("Error al iniciar sesión. Intenta de nuevo.");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div className="login-page">
             <div className="login-card">
-                <h2>Iniciar Sesión</h2>
+                {/* Logo/Brand */}
+                <div className="navbar-logo" style={{ margin: '0 auto 1.5rem' }}>
+                    BN
+                </div>
+
+                <h2>Bienvenido a BancoNex</h2>
+                <p className="subtitle">Ingresa a tu cuenta para gestionar tus inversiones</p>
+
                 <form onSubmit={handleLogin}>
-                    <input
-                        placeholder="Usuario"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
-                    <input
-                        type="password"
-                        placeholder="Contraseña"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                    <button type="submit">Entrar</button>
+                    <div className="form-group">
+                        <label htmlFor="username">Usuario</label>
+                        <input
+                            id="username"
+                            type="text"
+                            placeholder="Ingresa tu usuario"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                            disabled={loading}
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="password">Contraseña</label>
+                        <input
+                            id="password"
+                            type="password"
+                            placeholder="Ingresa tu contraseña"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            disabled={loading}
+                        />
+                    </div>
+
+                    {error && <div className="error">{error}</div>}
+
+                    <button
+                        type="submit"
+                        className="btn-primary"
+                        disabled={loading}
+                    >
+                        {loading ? "Ingresando..." : "Iniciar Sesión"}
+                    </button>
                 </form>
-                {error && <p className="error">{error}</p>}
+
                 <p className="register-text">
-                    ¿No tienes cuenta? <Link to="/register">Regístrate</Link>
+                    ¿No tienes cuenta? <Link to="/register">Regístrate aquí</Link>
                 </p>
             </div>
         </div>

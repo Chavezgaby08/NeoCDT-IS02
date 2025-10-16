@@ -6,7 +6,7 @@ export default function Navbar() {
 
     return (
         <nav className="navbar">
-            <h2>NeoCDT</h2>
+            <h2>BancoNex</h2>
             <div className="nav-links">
                 <Link to="/dashboard">Inicio</Link>
                 <Link to="/solicitudes">Solicitudes</Link>
