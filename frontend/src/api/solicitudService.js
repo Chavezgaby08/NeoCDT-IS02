@@ -1,149 +1,121 @@
-//REEMPLAZAR CUANDO EL BACKEND ESTÉ LISTO
+import api from "./api";
 
-// Simulación de base de datos en memoria
-let MOCK_SOLICITUDES = [
-    {
-        id: 1,
-        monto: 5000000,
-        plazo: 180,
-        estado: "Aprobada",
-        fechaCreacion: "2025-01-15T10:00:00Z",
-        tasa: 8.5
-    },
-    {
-        id: 2,
-        monto: 3000000,
-        plazo: 90,
-        estado: "En validación",
-        fechaCreacion: "2025-02-01T14:30:00Z",
-        tasa: null
-    },
-    {
-        id: 3,
-        monto: 10000000,
-        plazo: 360,
-        estado: "Borrador",
-        fechaCreacion: "2025-02-10T09:15:00Z",
-        tasa: null
+const toNumberCOP = (v) => Number(String(v ?? "").replace(/[^\d]/g, "")) || 0;
+const diasAmeses = (d) => Math.max(1, Math.round(Number(d || 0) / 30));
+
+function buildBodyFromForm(input = {}) {
+  const { monto, montoInput, plazo, plazoDias, plazoMeses, tasa, tasaInteres } =
+    input;
+
+  const montoNumber = toNumberCOP(montoInput ?? monto);
+
+  let meses;
+  if (plazoMeses != null) {
+    meses = Number(plazoMeses);
+  } else if (plazoDias != null) {
+    meses = diasAmeses(plazoDias);
+  } else if (plazo != null) {
+    const p = Number(plazo);
+    meses = p >= 30 ? diasAmeses(p) : Math.max(1, p);
+  }
+
+  const body = {
+    monto: montoNumber,
+    plazoMeses: meses,
+  };
+  const t = tasaInteres ?? tasa;
+  if (t != null && Number.isFinite(Number(t))) body.tasaInteres = Number(t);
+
+  if (!Number.isFinite(body.monto) || body.monto <= 0)
+    throw new Error("Monto inválido");
+  if (!Number.isFinite(body.plazoMeses) || body.plazoMeses <= 0)
+    throw new Error("Plazo inválido");
+
+  return body;
+}
+
+export async function getSolicitudes(params = {}) {
+  const { page = 1, pageSize = 10 } = params;
+  const { data } = await api.get("/api/solicitudes", {
+    params: { page, pageSize },
+  });
+  return data;
+}
+
+export async function getSolicitudById(id) {
+  const { data } = await api.get(`/api/solicitudes/${id}`);
+  return data;
+}
+
+export async function createSolicitud(formData) {
+  try {
+    const body = buildBodyFromForm(formData);
+    const { data } = await api.post("/api/solicitudes", body);
+    return data;
+  } catch (err) {
+    throw new Error(
+      err?.response?.data?.message ||
+        err.message ||
+        "Error al crear la solicitud",
+    );
+  }
+}
+
+export async function updateSolicitud(id, formData) {
+  try {
+    const partial = {};
+    if (formData.monto != null || formData.montoInput != null) {
+      partial.monto = toNumberCOP(formData.montoInput ?? formData.monto);
     }
-];
-
-let nextId = 4;
-
-// Simular delay de red
-const delay = (ms = 500) => new Promise(resolve => setTimeout(resolve, ms));
-
-export const getSolicitudes = async () => {
-    await delay(300);
-    console.log('📋 [MOCK] Obteniendo solicitudes:', MOCK_SOLICITUDES.length);
-    return [...MOCK_SOLICITUDES];
-};
-
-export const getSolicitudById = async (id) => {
-    await delay(300);
-    const solicitud = MOCK_SOLICITUDES.find(s => s.id === parseInt(id));
-    console.log('📋 [MOCK] Obteniendo solicitud:', id, solicitud);
-    return solicitud;
-};
-
-export const createSolicitud = async (solicitud) => {
-    await delay(500);
-
-    const nuevaSolicitud = {
-        id: nextId++,
-        ...solicitud,
-        fechaCreacion: new Date().toISOString(),
-        tasa: null
-    };
-
-    MOCK_SOLICITUDES.push(nuevaSolicitud);
-    console.log('✅ [MOCK] Solicitud creada:', nuevaSolicitud);
-    return nuevaSolicitud;
-};
-
-export const updateSolicitud = async (id, solicitudActualizada) => {
-    await delay(500);
-
-    const index = MOCK_SOLICITUDES.findIndex(s => s.id === parseInt(id));
-
-    if (index !== -1) {
-        MOCK_SOLICITUDES[index] = {
-            ...MOCK_SOLICITUDES[index],
-            ...solicitudActualizada,
-            id: parseInt(id) // Mantener el ID original
-        };
-        console.log('✅ [MOCK] Solicitud actualizada:', MOCK_SOLICITUDES[index]);
-        return MOCK_SOLICITUDES[index];
-    } else {
-        console.error('❌ [MOCK] Solicitud no encontrada:', id);
-        throw new Error('Solicitud no encontrada');
+    if (formData.plazoMeses != null) {
+      partial.plazoMeses = Number(formData.plazoMeses);
+    } else if (formData.plazoDias != null) {
+      partial.plazoMeses = diasAmeses(formData.plazoDias);
+    } else if (formData.plazo != null) {
+      const p = Number(formData.plazo);
+      partial.plazoMeses = p >= 30 ? diasAmeses(p) : Math.max(1, p);
     }
-};
-
-export const deleteSolicitud = async (id) => {
-    await delay(400);
-
-    const index = MOCK_SOLICITUDES.findIndex(s => s.id === parseInt(id));
-
-    if (index !== -1) {
-        // Solo permitir eliminar si está en Borrador
-        if (MOCK_SOLICITUDES[index].estado !== "Borrador") {
-            console.error('❌ [MOCK] No se puede eliminar. Estado:', MOCK_SOLICITUDES[index].estado);
-            throw new Error('Solo se pueden eliminar solicitudes en estado Borrador');
-        }
-
-        const eliminada = MOCK_SOLICITUDES.splice(index, 1);
-        console.log('✅ [MOCK] Solicitud eliminada:', eliminada[0]);
-        return true;
-    } else {
-        console.error('❌ [MOCK] Solicitud no encontrada:', id);
-        throw new Error('Solicitud no encontrada');
+    if (formData.tasaInteres != null || formData.tasa != null) {
+      partial.tasaInteres = Number(formData.tasaInteres ?? formData.tasa);
     }
-};
+    if (formData.estado != null) {
+      partial.estado = mapEstadoToBackend(formData.estado);
+    }
+    if (formData.motivoRechazo != null) {
+      partial.motivoRechazo = formData.motivoRechazo;
+    }
 
-// Función helper para debugging
-export const resetMockData = () => {
-    MOCK_SOLICITUDES = [
-        {
-            id: 1,
-            monto: 5000000,
-            plazo: 180,
-            estado: "Aprobada",
-            fechaCreacion: "2025-01-15T10:00:00Z",
-            tasa: 8.5
-        },
-        {
-            id: 2,
-            monto: 3000000,
-            plazo: 90,
-            estado: "En validación",
-            fechaCreacion: "2025-02-01T14:30:00Z",
-            tasa: null
-        },
-        {
-            id: 3,
-            monto: 10000000,
-            plazo: 360,
-            estado: "Borrador",
-            fechaCreacion: "2025-02-10T09:15:00Z",
-            tasa: null
-        }
-    ];
-    nextId = 4;
-    console.log('🔄 [MOCK] Datos reseteados');
-};
+    const { data } = await api.put(`/api/solicitudes/${id}`, partial);
+    return data;
+  } catch (err) {
+    throw new Error(
+      err?.response?.data?.message ||
+        err.message ||
+        "Error al actualizar la solicitud",
+    );
+  }
+}
 
-export const getMockStats = () => {
-    console.table(MOCK_SOLICITUDES);
-    return {
-        total: MOCK_SOLICITUDES.length,
-        porEstado: {
-            Borrador: MOCK_SOLICITUDES.filter(s => s.estado === "Borrador").length,
-            "En validación": MOCK_SOLICITUDES.filter(s => s.estado === "En validación").length,
-            Aprobada: MOCK_SOLICITUDES.filter(s => s.estado === "Aprobada").length,
-            Rechazada: MOCK_SOLICITUDES.filter(s => s.estado === "Rechazada").length,
-            Cancelada: MOCK_SOLICITUDES.filter(s => s.estado === "Cancelada").length,
-        }
-    };
-};
+export async function deleteSolicitud(id) {
+  try {
+    const { data } = await api.delete(`/api/solicitudes/${id}`);
+    return data;
+  } catch (err) {
+    throw new Error(
+      err?.response?.data?.message ||
+        err.message ||
+        "Error al eliminar la solicitud",
+    );
+  }
+}
 
+const mapEstadoToBackend = (estadoFrontend) => {
+  const mapeo = {
+    Borrador: "BORRADOR",
+    "En validación": "EN_VALIDACION",
+    Aprobada: "APROBADA",
+    Rechazada: "RECHAZADA",
+    Cancelada: "CANCELADA",
+  };
+  return mapeo[estadoFrontend] || estadoFrontend;
+};

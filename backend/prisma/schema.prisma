@@ -1,0 +1,112 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enum para roles de usuario
+enum RolUsuario {
+  CLIENTE
+  AGENTE
+  ADMINISTRADOR
+}
+
+// Enum para estados de solicitud CDT
+enum EstadoSolicitud {
+  BORRADOR
+  EN_VALIDACION
+  APROBADA
+  RECHAZADA
+  CANCELADA
+}
+
+// Tabla de Usuarios (para autenticación)
+model Usuario {
+  id        String      @id @default(uuid())
+  email     String      @unique
+  password  String      // Hash de contraseña
+  rol       RolUsuario  @default(CLIENTE)
+  activo    Boolean     @default(true)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  // Relación con Cliente
+  cliente Cliente?
+
+  @@map("usuarios")
+}
+
+// Tabla de Clientes (información KYC)
+model Cliente {
+  id              String    @id @default(uuid())
+  usuarioId       String    @unique
+  nombres         String
+  apellidos       String
+  tipoDocumento   String    // CC, CE, PAS
+  numeroDocumento String    @unique
+  telefono        String?
+  fechaNacimiento DateTime?
+  direccion       String?
+  ciudad          String?
+  pais            String    @default("CO")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relaciones
+  usuario        Usuario        @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  solicitudesCDT SolicitudCDT[]
+
+  @@map("clientes")
+}
+
+// Tabla principal de Solicitudes de CDT
+model SolicitudCDT {
+  id               String          @id @default(uuid())
+  clienteId        String
+  // Datos del CDT
+  monto            Decimal         @db.Decimal(15, 2) // Monto a invertir
+  plazoMeses       Int              // Duración en meses (3, 6, 12, 24, etc)
+  tasaInteres      Decimal         @db.Decimal(5, 2) // Tasa de interés anual
+
+  // Estado y seguimiento
+  estado           EstadoSolicitud @default(BORRADOR)
+  motivoRechazo    String?         // Si es rechazada
+
+  // Fechas
+  fechaApertura    DateTime?       // Cuando se aprueba
+  fechaVencimiento DateTime?       // Calculada: fechaApertura + plazoMeses
+
+  // Auditoría
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  cliente          Cliente           @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  historialEstados HistorialEstado[]
+
+  @@map("solicitudes_cdt")
+  @@index([clienteId])
+  @@index([estado])
+  @@index([createdAt])
+}
+
+// Tabla de trazabilidad de cambios de estado
+model HistorialEstado {
+  id             String           @id @default(uuid())
+  solicitudId    String
+  estadoAnterior EstadoSolicitud?
+  estadoNuevo    EstadoSolicitud
+  observaciones  String?
+  cambiadoPor    String?          // Email del usuario que hizo el cambio
+  createdAt      DateTime         @default(now())
+
+  // Relación
+  solicitud SolicitudCDT @relation(fields: [solicitudId], references: [id], onDelete: Cascade)
+
+  @@map("historial_estados")
+  @@index([solicitudId])
+}

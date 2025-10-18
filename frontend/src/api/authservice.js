@@ -1,99 +1,106 @@
-// Usuarios de prueba en memoria
-const MOCK_USERS = [
-    {
-        id: 1,
-        username: "admin",
-        password: "123456",
-        cedula: "1234567890",
-        email: "admin@neocdt.com"
-    },
-    {
-        id: 2,
-        username: "test",
-        password: "test123",
-        cedula: "9876543210",
-        email: "test@neocdt.com"
-    }
-];
+const API_URL = "http://localhost:3000/api";
 
-export const loginUser = async (username, password) => {
-    // Simular delay de red
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    console.log('🔵 [MOCK] Intentando login con:', { username });
-
-    // Buscar usuario
-    const user = MOCK_USERS.find(
-        u => u.username === username && u.password === password
-    );
-
-    if (user) {
-        console.log('✅ [MOCK] Login exitoso');
-        return {
-            success: true,
-            user: {
-                id: user.id,
-                username: user.username,
-                email: user.email,
-                cedula: user.cedula
-            }
-        };
-    } else {
-        console.log('❌ [MOCK] Login fallido');
-        return {
-            success: false,
-            message: 'Usuario o contraseña incorrectos'
-        };
-    }
-};
-
-export const registerUser = async (userData) => {
-    // Simular delay de red
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    console.log('🔵 [MOCK] Intentando registro:', {
-        username: userData.username,
-        cedula: userData.cedula
+// Iniciar sesión
+export const loginUser = async (email, password) => {
+  try {
+    const response = await fetch(`${API_URL}/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: email, // El backend espera "username" pero es el email
+        password: password,
+      }),
     });
 
-    // Verificar si el usuario ya existe
-    const existingUser = MOCK_USERS.find(
-        u => u.username === userData.username || u.cedula === userData.cedula
-    );
+    const data = await response.json();
 
-    if (existingUser) {
-        console.log('❌ [MOCK] Usuario ya existe');
-        return {
-            success: false,
-            message: 'El usuario o cédula ya están registrados'
-        };
+    if (!response.ok) {
+      return {
+        success: false,
+        message: data.message || "Error al iniciar sesión",
+      };
     }
 
-    // "Registrar" nuevo usuario (solo en memoria)
-    const newUser = {
-        id: MOCK_USERS.length + 1,
-        username: userData.username,
-        cedula: userData.cedula,
-        email: userData.email,
-        password: userData.password
-    };
-
-    MOCK_USERS.push(newUser);
-    console.log('✅ [MOCK] Registro exitoso. Usuarios totales:', MOCK_USERS.length);
+    // Guardar token y usuario en localStorage
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+    }
 
     return {
-        success: true,
-        user: {
-            id: newUser.id,
-            username: newUser.username,
-            email: newUser.email,
-            cedula: newUser.cedula
-        }
+      success: true,
+      user: data.user,
+      token: data.token,
     };
+  } catch (error) {
+    console.error("Error en login:", error);
+    return {
+      success: false,
+      message: "Error de conexión con el servidor",
+    };
+  }
 };
 
-// Función helper para ver usuarios (solo para debug)
-export const getMockUsers = () => {
-    console.table(MOCK_USERS);
-    return MOCK_USERS;
+// Registrar usuario
+export const registerUser = async (userData) => {
+  try {
+    const response = await fetch(`${API_URL}/auth/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        nombreCompleto: userData.nombreCompleto,
+        username: userData.email || userData.correo, // username es el email
+        cedula: userData.cedula,
+        correo: userData.email || userData.correo,
+        telefono: userData.telefono,
+        password: userData.password,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: data.message || "Error al registrar usuario",
+      };
+    }
+
+    return {
+      success: true,
+      message: data.message,
+    };
+  } catch (error) {
+    console.error("Error en registro:", error);
+    return {
+      success: false,
+      message: "Error de conexión con el servidor",
+    };
+  }
+};
+
+// Cerrar sesión
+export const logoutUser = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+};
+
+// Obtener token
+export const getToken = () => {
+  return localStorage.getItem("token");
+};
+
+// Obtener usuario actual
+export const getCurrentUser = () => {
+  const userStr = localStorage.getItem("user");
+  return userStr ? JSON.parse(userStr) : null;
+};
+
+// Verificar si está autenticado
+export const isAuthenticated = () => {
+  return !!getToken();
 };

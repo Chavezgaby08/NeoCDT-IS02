@@ -12,15 +12,30 @@ export default function App() {
   const { user } = useAuth();
 
   return (
-    <div style={{ minHeight: '100vh' }}>
+    <div style={{ minHeight: "100vh" }}>
       {user && <Navbar />}
       <Routes>
-        <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LoginPage />} />
+        <Route
+          path="/"
+          element={user ? <Navigate to="/dashboard" /> : <LoginPage />}
+        />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/" />} />
-        <Route path="/solicitudes" element={user ? <SolicitudesList /> : <Navigate to="/" />} />
-        <Route path="/solicitudes/:id" element={user ? <DetalleSolicitud /> : <Navigate to="/" />} />
-        <Route path="/solicitudes/edit/:id" element={user ? <EditSolicitud /> : <Navigate to="/" />} />
+        <Route
+          path="/dashboard"
+          element={user ? <Dashboard /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/solicitudes"
+          element={user ? <SolicitudesList /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/solicitudes/:id"
+          element={user ? <DetalleSolicitud /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/solicitudes/edit/:id"
+          element={user ? <EditSolicitud /> : <Navigate to="/" />}
+        />
       </Routes>
     </div>
   );
