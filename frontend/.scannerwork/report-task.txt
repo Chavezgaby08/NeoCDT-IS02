@@ -1,0 +1,6 @@
+projectKey=neocdt
+serverUrl=http://localhost:9000
+serverVersion=25.10.0.114319
+dashboardUrl=http://localhost:9000/dashboard?id=neocdt
+ceTaskId=f9bff8ec-7acc-4327-9d80-3031991c2630
+ceTaskUrl=http://localhost:9000/api/ce/task?id=f9bff8ec-7acc-4327-9d80-3031991c2630
