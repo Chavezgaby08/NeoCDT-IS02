@@ -90,7 +90,7 @@ export default function Dashboard() {
         <div className="dashboard-stats">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="stat-card">
-              <div className="skeleton" style={{ height: "120px" }}></div>
+              <div className="skeleton" style={{ height: '120px' }}></div>
             </div>
           ))}
         </div>
@@ -108,12 +108,7 @@ export default function Dashboard() {
 
           <div className="stat-card">
             <div className="stat-card-header">
-              <div
-                className="stat-icon"
-                style={{
-                  background: "linear-gradient(135deg, #4CAF50, #66BB6A)",
-                }}
-              >
+              <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #4CAF50, #66BB6A)' }}>
                 ✓
               </div>
               <div className="stat-card-content">
@@ -125,12 +120,7 @@ export default function Dashboard() {
 
           <div className="stat-card">
             <div className="stat-card-header">
-              <div
-                className="stat-icon"
-                style={{
-                  background: "linear-gradient(135deg, #FF9800, #FFB74D)",
-                }}
-              >
+              <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #FF9800, #FFB74D)' }}>
                 ⏳
               </div>
               <div className="stat-card-content">
@@ -142,19 +132,12 @@ export default function Dashboard() {
 
           <div className="stat-card">
             <div className="stat-card-header">
-              <div
-                className="stat-icon"
-                style={{
-                  background: "linear-gradient(135deg, #00D9B5, #26E7C5)",
-                }}
-              >
+              <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #00D9B5, #26E7C5)' }}>
                 💰
               </div>
               <div className="stat-card-content">
                 <h4>Monto Invertido</h4>
-                <p style={{ fontSize: "1.5rem" }}>
-                  {formatCurrency(stats.montoTotal)}
-                </p>
+                <p style={{ fontSize: '1.5rem' }}>{formatCurrency(stats.montoTotal)}</p>
               </div>
             </div>
           </div>
@@ -164,36 +147,34 @@ export default function Dashboard() {
       <div className="dashboard-actions">
         <button
           className="btn-primary"
-          onClick={() => navigate("/solicitudes")}
-          style={{ padding: "1rem 2rem", fontSize: "1.1rem" }}
+          onClick={() => navigate('/solicitudes')}
+          style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}
         >
           Ver Mis Solicitudes
         </button>
       </div>
 
-      {/* Acciones Rápidas */}
-      <div style={{ marginTop: "3rem", textAlign: "center" }}>
-        <h3 style={{ marginBottom: "1.5rem", color: "var(--gray-700)" }}>
+      {/* Quick Actions */}
+      <div style={{ marginTop: '3rem', textAlign: 'center' }}>
+        <h3 style={{ marginBottom: '1.5rem', color: 'var(--gray-700)' }}>
           Acciones Rápidas
         </h3>
-        <div
-          style={{
-            display: "flex",
-            gap: "1rem",
-            justifyContent: "center",
-            flexWrap: "wrap",
-          }}
-        >
+        <div style={{
+          display: 'flex',
+          gap: '1rem',
+          justifyContent: 'center',
+          flexWrap: 'wrap'
+        }}>
           <button
             className="btn-secondary"
-            onClick={() => navigate("/solicitudes")}
+            onClick={() => navigate('/solicitudes')}
             style={{
-              padding: "0.75rem 1.5rem",
-              background: "white",
-              border: "2px solid var(--gray-300)",
-              borderRadius: "var(--radius-full)",
-              fontWeight: "600",
-              cursor: "pointer",
+              padding: '0.75rem 1.5rem',
+              background: 'white',
+              border: '2px solid var(--gray-300)',
+              borderRadius: 'var(--radius-full)',
+              fontWeight: '600',
+              cursor: 'pointer'
             }}
           >
             📋 Ver todas las solicitudes
@@ -201,14 +182,14 @@ export default function Dashboard() {
 
           <button
             className="btn-secondary"
-            onClick={() => navigate("/solicitudes/nueva")}
+            onClick={() => navigate('/solicitudes')}
             style={{
-              padding: "0.75rem 1.5rem",
-              background: "white",
-              border: "2px solid var(--gray-300)",
-              borderRadius: "var(--radius-full)",
-              fontWeight: "600",
-              cursor: "pointer",
+              padding: '0.75rem 1.5rem',
+              background: 'white',
+              border: '2px solid var(--gray-300)',
+              borderRadius: 'var(--radius-full)',
+              fontWeight: '600',
+              cursor: 'pointer'
             }}
           >
             ➕ Crear nueva solicitud

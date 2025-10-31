@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import HomePage from "./pages/HomePage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
@@ -17,24 +18,27 @@ export default function App() {
       <Routes>
         <Route
           path="/"
+          element={<HomePage />} />
+        <Route
+          path="/login"
           element={user ? <Navigate to="/dashboard" /> : <LoginPage />}
         />
         <Route path="/register" element={<RegisterPage />} />
         <Route
           path="/dashboard"
-          element={user ? <Dashboard /> : <Navigate to="/" />}
+          element={user ? <Dashboard /> : <Navigate to="/login" />}
         />
         <Route
           path="/solicitudes"
-          element={user ? <SolicitudesList /> : <Navigate to="/" />}
+          element={user ? <SolicitudesList /> : <Navigate to="/login" />}
         />
         <Route
           path="/solicitudes/:id"
-          element={user ? <DetalleSolicitud /> : <Navigate to="/" />}
+          element={user ? <DetalleSolicitud /> : <Navigate to="/login" />}
         />
         <Route
           path="/solicitudes/edit/:id"
-          element={user ? <EditSolicitud /> : <Navigate to="/" />}
+          element={user ? <EditSolicitud /> : <Navigate to="/login" />}
         />
       </Routes>
     </div>
