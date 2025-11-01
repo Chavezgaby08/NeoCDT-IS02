@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
+import ThemeToggle from "../components/ThemeToggle.jsx";
 
 export default function HomePage() {
     const navigate = useNavigate();
@@ -21,6 +22,7 @@ export default function HomePage() {
                         <h2>BancoNex</h2>
                     </div>
                     <div className="homepage-nav-links">
+                        <ThemeToggle />
                         <button
                             className="btn-ghost"
                             onClick={() => navigate("/login")}

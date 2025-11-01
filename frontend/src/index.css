@@ -2029,3 +2029,509 @@ select:focus {
     font-size: 2rem;
   }
 }
+
+/* ============================================
+   MODO OSCURO - DARK MODE
+   ============================================ */
+
+/* Variables para modo oscuro */
+body.dark-mode {
+  /* Colores principales(modo oscuro) */
+  --primary: #3385ff;
+  --primary-dark: #1a66cc;
+  --primary-light: #5c9dff;
+  --secondary: #00d4ff;
+  --accent: #ff8533;
+
+  /* Grises invertidos para modo oscuro */
+  --gray-50: #1a1a1a;
+  --gray-100: #252525;
+  --gray-200: #2f2f2f;
+  --gray-300: #3a3a3a;
+  --gray-400: #4a4a4a;
+  --gray-500: #6a6a6a;
+  --gray-600: #9a9a9a;
+  --gray-700: #b0b0b0;
+  --gray-800: #d0d0d0;
+  --gray-900: #e8e8e8;
+
+  /* Estados */
+  --success: #00e676;
+  --warning: #ffc107;
+  --error: #ff5252;
+  --info: #29b6f6;
+
+  /* Estados CDT */
+  --estado-borrador: #b0b0b0;
+  --estado-validacion: #ffb74d;
+  --estado-aprobada: #66bb6a;
+  --estado-rechazada: #ef5350;
+  --estado-cancelada: #9e9e9e;
+
+  /* Sombras para modo oscuro */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.7);
+
+  /* Fondo principal */
+  background: var(--gray-50);
+  color: var(--gray-900);
+}
+
+/* ============================================
+   COMPONENTE THEME TOGGLE
+   ============================================ */
+.theme-toggle {
+  background: var(--gray-100);
+  border: 2px solid var(--gray-300);
+  border-radius: var(--radius-full);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.25rem;
+  transition: all var(--transition-fast);
+  padding: 0;
+}
+
+.theme-toggle:hover {
+  background: var(--gray-200);
+  border-color: var(--primary);
+  transform: scale(1.05);
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+}
+
+/* ============================================
+   AJUSTES  PARA MODO OSCURO
+   ============================================ */
+
+/* Navbar */
+body.dark-mode .navbar {
+  background: var(--gray-100);
+  border-bottom-color: var(--gray-300);
+}
+
+body.dark-mode .navbar-brand h2 {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+body.dark-mode .nav-links a {
+  color: var(--gray-700);
+}
+
+body.dark-mode .nav-links a:hover {
+  color: var(--primary);
+  background: var(--gray-200);
+}
+
+body.dark-mode .nav-links a.active {
+  color: var(--primary);
+}
+
+body.dark-mode .nav-links button {
+  background: transparent;
+  color: var(--gray-700);
+  border-color: var(--gray-400);
+}
+
+body.dark-mode .nav-links button:hover {
+  background: var(--error);
+  color: white;
+  border-color: var(--error);
+}
+
+/* Cards y contenedores blancos */
+body.dark-mode .stat-card,
+body.dark-mode .solicitud-card,
+body.dark-mode .feature-card,
+body.dark-mode .step-card,
+body.dark-mode .filters-container,
+body.dark-mode .empty-state {
+  background: var(--gray-100);
+  border-color: var(--gray-300);
+}
+
+body.dark-mode .stat-card:hover,
+body.dark-mode .solicitud-card:hover,
+body.dark-mode .feature-card:hover {
+  background: var(--gray-200);
+}
+
+/* Login y Register cards */
+body.dark-mode .login-card,
+body.dark-mode .register-card,
+body.dark-mode .form-solicitud {
+  background: var(--gray-100);
+}
+
+/* Inputs */
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+  background: var(--gray-200);
+  border-color: var(--gray-400);
+  color: var(--gray-900);
+}
+
+body.dark-mode input:focus,
+body.dark-mode select:focus,
+body.dark-mode textarea:focus {
+  background: var(--gray-300);
+  border-color: var(--primary);
+}
+
+body.dark-mode input::placeholder {
+  color: var(--gray-500);
+}
+
+/* Botones secundarios */
+body.dark-mode .btn-secondary,
+body.dark-mode .btn-edit {
+  background: var(--gray-200);
+  color: var(--gray-800);
+}
+
+body.dark-mode .btn-secondary:hover,
+body.dark-mode .btn-edit:hover {
+  background: var(--gray-300);
+}
+
+/* Skeleton loader */
+body.dark-mode .skeleton {
+  background: linear-gradient(90deg,
+      var(--gray-200) 0px,
+      var(--gray-300) 40px,
+      var(--gray-200) 80px);
+}
+
+/* Detalles de solicitud */
+body.dark-mode .solicitud-details,
+body.dark-mode .detail-row {
+  border-color: var(--gray-300);
+}
+
+body.dark-mode .detail-label {
+  color: var(--gray-600);
+}
+
+body.dark-mode .detail-value {
+  color: var(--gray-900);
+}
+
+/* Estados badge - ajustar contraste */
+body.dark-mode .estado-borrador {
+  background: rgba(176, 176, 176, 0.25);
+  color: var(--estado-borrador);
+}
+
+body.dark-mode .estado-validacion {
+  background: rgba(255, 183, 77, 0.25);
+  color: var(--estado-validacion);
+}
+
+body.dark-mode .estado-aprobada {
+  background: rgba(102, 187, 106, 0.25);
+  color: var(--estado-aprobada);
+}
+
+body.dark-mode .estado-rechazada {
+  background: rgba(239, 83, 80, 0.25);
+  color: var(--estado-rechazada);
+}
+
+body.dark-mode .estado-cancelada {
+  background: rgba(158, 158, 158, 0.25);
+  color: var(--estado-cancelada);
+}
+
+/* Homepage - ajustes específicos */
+body.dark-mode .homepage {
+  background: var(--gray-50);
+}
+
+body.dark-mode .homepage-navbar {
+  background: var(--gray-100);
+  border-bottom-color: var(--gray-300);
+}
+
+body.dark-mode .hero-section {
+  background: linear-gradient(180deg, var(--gray-100) 0%, var(--gray-50) 100%);
+}
+
+body.dark-mode .features-section {
+  background: var(--gray-100);
+}
+
+body.dark-mode .how-it-works-section {
+  background: var(--gray-50);
+}
+
+body.dark-mode .floating-card {
+  background: var(--gray-100);
+}
+
+body.dark-mode .btn-ghost:hover {
+  background: var(--gray-200);
+}
+
+/* Footer oscuro */
+body.dark-mode .homepage-footer {
+  background: var(--gray-100);
+  border-top: 1px solid var(--gray-300);
+}
+
+body.dark-mode .footer-bottom {
+  border-top-color: var(--gray-300);
+}
+
+body.dark-mode .footer-column a {
+  color: var(--gray-600);
+}
+
+body.dark-mode .footer-column a:hover {
+  color: var(--gray-900);
+}
+
+/* CTA Section en modo oscuro */
+body.dark-mode .cta-section {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+}
+
+/* Modal overlay */
+body.dark-mode .modal-overlay {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+/* Textos */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+  color: var(--gray-900);
+}
+
+body.dark-mode p {
+  color: var(--gray-700);
+}
+
+body.dark-mode .subtitle,
+body.dark-mode .hero-subtitle,
+body.dark-mode .section-subtitle {
+  color: var(--gray-600);
+}
+
+/* Links */
+body.dark-mode a {
+  color: var(--primary-light);
+}
+
+body.dark-mode a:hover {
+  color: var(--primary);
+}
+
+/* Error messages */
+body.dark-mode .error {
+  background: rgba(255, 82, 82, 0.2);
+  color: var(--error);
+  border-left-color: var(--error);
+}
+
+/* Ajustes para mejorar legibilidad */
+body.dark-mode .solicitud-id,
+body.dark-mode .stat-card-content h4 {
+  color: var(--gray-600);
+}
+
+body.dark-mode .solicitud-monto,
+body.dark-mode .stat-card-content p {
+  color: var(--gray-900);
+}
+
+/* Botón cerrar modal */
+body.dark-mode .btn-close {
+  color: var(--gray-600);
+}
+
+body.dark-mode .btn-close:hover {
+  background: var(--gray-200);
+  color: var(--gray-900);
+}
+
+/* Dashboard header */
+body.dark-mode .dashboard-header h2 {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Proyección de rendimiento */
+body.dark-mode .solicitud-details {
+  border-top-color: var(--gray-300);
+}
+
+/* Animación suave de transición */
+body,
+.navbar,
+.stat-card,
+.solicitud-card,
+input,
+select,
+button,
+.form-solicitud {
+  transition:
+    background-color var(--transition-normal),
+    border-color var(--transition-normal),
+    color var(--transition-normal);
+}
+
+/* Ajuste para el gradiente de texto en modo oscuro */
+body.dark-mode .gradient-text {
+  background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Mejora de contraste para iconos */
+body.dark-mode .stat-icon,
+body.dark-mode .navbar-logo {
+  box-shadow: var(--shadow-md);
+}
+
+/* Hover effects mejorados para modo oscuro */
+body.dark-mode .btn-primary:hover {
+  box-shadow: 0 8px 16px rgba(51, 133, 255, 0.4);
+}
+
+body.dark-mode .btn-new-solicitud:hover {
+  box-shadow: 0 8px 16px rgba(51, 133, 255, 0.4);
+}
+
+/* Separadores */
+body.dark-mode .nav-links>div {
+  border-left-color: var(--gray-400);
+}
+
+/* Botones de acciones rápidas en Dashboard - Modo Oscuro */
+body.dark-mode .dashboard .btn-secondary {
+  background: var(--gray-200);
+  color: var(--gray-900);
+  border-color: var(--gray-400);
+}
+
+body.dark-mode .dashboard .btn-secondary:hover {
+  background: var(--gray-300);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Alternativa: Si los botones tienen un estilo inline que los hace blancos */
+body.dark-mode .dashboard button[style*="background: white"],
+body.dark-mode .dashboard button[style*="background:white"] {
+  background: var(--gray-200) !important;
+  color: var(--gray-900) !important;
+  border-color: var(--gray-400) !important;
+}
+
+body.dark-mode .dashboard button[style*="background: white"]:hover,
+body.dark-mode .dashboard button[style*="background:white"]:hover {
+  background: var(--gray-300) !important;
+  border-color: var(--primary) !important;
+}
+
+/* Asegurar que los iconos también se vean bien */
+body.dark-mode .dashboard-actions button {
+  transition: all var(--transition-fast);
+}
+
+/* Si hay un contenedor específico para acciones rápidas */
+body.dark-mode [style*="marginTop: '3rem'"] button {
+  background: var(--gray-200) !important;
+  color: var(--gray-900) !important;
+  border-color: var(--gray-400) !important;
+}
+
+body.dark-mode [style*="marginTop: '3rem'"] button:hover {
+  background: var(--gray-300) !important;
+  border-color: var(--primary) !important;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Inputs  */
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+  background: #2a2a2a !important;
+  border-color: var(--gray-400);
+  color: #e8e8e8 !important;
+  -webkit-text-fill-color: #e8e8e8 !important;
+}
+
+body.dark-mode input:focus,
+body.dark-mode select:focus,
+body.dark-mode textarea:focus {
+  background: #333333 !important;
+  border-color: var(--primary);
+  color: #e8e8e8 !important;
+  -webkit-text-fill-color: #e8e8e8 !important;
+}
+
+/* Placeholders */
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+  color: #9a9a9a !important;
+  opacity: 1;
+}
+
+/* Autocompletado */
+body.dark-mode input:-webkit-autofill,
+body.dark-mode input:-webkit-autofill:hover,
+body.dark-mode input:-webkit-autofill:focus,
+body.dark-mode input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 50px #2a2a2a inset !important;
+  -webkit-text-fill-color: #e8e8e8 !important;
+  caret-color: #e8e8e8 !important;
+}
+
+/* Cursor visible */
+body.dark-mode input,
+body.dark-mode textarea {
+  caret-color: var(--primary) !important;
+}
+
+/* Inputs deshabilitados */
+body.dark-mode input:disabled,
+body.dark-mode select:disabled,
+body.dark-mode textarea:disabled {
+  background: var(--gray-200) !important;
+  color: var(--gray-600) !important;
+  opacity: 0.6;
+}
+
+/* Símbolo de moneda */
+body.dark-mode .form-group span[style*="position: absolute"] {
+  color: #9a9a9a !important;
+}
+
+
+/* Responsive - asegurar que funcione bien en móvil */
+@media (max-width: 768px) {
+  body.dark-mode .theme-toggle {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+}

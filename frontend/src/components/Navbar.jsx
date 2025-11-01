@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
+import ThemeToggle from "./ThemeToggle.jsx";
 
 export default function Navbar() {
   const { logout, user } = useAuth();
@@ -43,6 +44,8 @@ export default function Navbar() {
         }}>
           👤 {user?.username || user?.email || "Usuario"}
         </span>
+
+        <ThemeToggle />
 
         <button onClick={logout}>
           Cerrar sesión
