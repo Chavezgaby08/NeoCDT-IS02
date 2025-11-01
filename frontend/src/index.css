@@ -2173,26 +2173,6 @@ body.dark-mode .form-solicitud {
   background: var(--gray-100);
 }
 
-/* Inputs */
-body.dark-mode input,
-body.dark-mode select,
-body.dark-mode textarea {
-  background: var(--gray-200);
-  border-color: var(--gray-400);
-  color: var(--gray-900);
-}
-
-body.dark-mode input:focus,
-body.dark-mode select:focus,
-body.dark-mode textarea:focus {
-  background: var(--gray-300);
-  border-color: var(--primary);
-}
-
-body.dark-mode input::placeholder {
-  color: var(--gray-500);
-}
-
 /* Botones secundarios */
 body.dark-mode .btn-secondary,
 body.dark-mode .btn-edit {
