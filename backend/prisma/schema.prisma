@@ -70,7 +70,7 @@ model SolicitudCDT {
   // Datos del CDT
   monto            Decimal         @db.Decimal(15, 2) // Monto a invertir
   plazoMeses       Int              // Duración en meses (3, 6, 12, 24, etc)
-  tasaInteres      Decimal         @db.Decimal(5, 2) // Tasa de interés anual
+  tasaInteres      Decimal         @default(0) @db.Decimal(5, 2) // CORRECCIÓN: Default 0, se asigna al aprobar
 
   // Estado y seguimiento
   estado           EstadoSolicitud @default(BORRADOR)

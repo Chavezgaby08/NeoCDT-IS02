@@ -28,10 +28,12 @@ export default function SolicitudesList() {
     setLoading(true);
     try {
       const data = await getSolicitudes();
+      console.log("📋 Solicitudes recibidas:", data);
       setSolicitudes(data);
       setFilteredSolicitudes(data);
     } catch (error) {
       console.error("Error cargando solicitudes:", error);
+      alert(error.message || "Error al cargar solicitudes");
     } finally {
       setLoading(false);
     }
@@ -41,8 +43,9 @@ export default function SolicitudesList() {
     if (filterEstado === "Todos") {
       setFilteredSolicitudes(solicitudes);
     } else {
+      const estadoBackend = mapEstadoToBackend(filterEstado);
       setFilteredSolicitudes(
-        solicitudes.filter((s) => s.estado === filterEstado),
+        solicitudes.filter((s) => s.estado === estadoBackend)
       );
     }
   };
@@ -50,9 +53,8 @@ export default function SolicitudesList() {
   const handleCreate = async (solicitud) => {
     try {
       await createSolicitud({
-        monto: solicitud.monto, // correcto
-        plazo: solicitud.plazo, // correcto
-        tasaInteres: solicitud.tasaInteres, // ahora obligatorio
+        monto: solicitud.monto,
+        plazo: solicitud.plazo,
       });
       setShowForm(false);
       loadSolicitudes();
@@ -69,7 +71,7 @@ export default function SolicitudesList() {
         loadSolicitudes();
       } catch (error) {
         console.error("Error eliminando solicitud:", error);
-        alert("Error al eliminar la solicitud");
+        alert(error.message || "Error al eliminar la solicitud");
       }
     }
   };
@@ -78,13 +80,32 @@ export default function SolicitudesList() {
     if (window.confirm("¿Deseas enviar esta solicitud a validación?")) {
       try {
         await updateSolicitud(solicitud.id, {
-          ...solicitud,
-          estado: "En validación",
+          estado: "EN_VALIDACION",
         });
+        console.log("✅ Solicitud enviada a validación:", solicitud.id);
         loadSolicitudes();
       } catch (error) {
-        console.error("Error enviando a validación:", error);
-        alert("Error al enviar la solicitud");
+        console.error("❌ Error enviando a validación:", error);
+        alert(error.message || "Error al enviar la solicitud");
+      }
+    }
+  };
+
+  const handleCancelar = async (solicitud) => {
+    if (
+      window.confirm(
+        "¿Estás seguro de cancelar esta solicitud? Esta acción no se puede deshacer."
+      )
+    ) {
+      try {
+        await updateSolicitud(solicitud.id, {
+          estado: "CANCELADA",
+        });
+        console.log("✅ Solicitud cancelada:", solicitud.id);
+        loadSolicitudes();
+      } catch (error) {
+        console.error("❌ Error cancelando solicitud:", error);
+        alert(error.message || "Error al cancelar la solicitud");
       }
     }
   };
@@ -109,13 +130,35 @@ export default function SolicitudesList() {
 
   const getEstadoBadgeClass = (estado) => {
     const estadoMap = {
-      Borrador: "estado-borrador",
-      "En validación": "estado-validacion",
-      Aprobada: "estado-aprobada",
-      Rechazada: "estado-rechazada",
-      Cancelada: "estado-cancelada",
+      BORRADOR: "estado-borrador",
+      EN_VALIDACION: "estado-validacion",
+      APROBADA: "estado-aprobada",
+      RECHAZADA: "estado-rechazada",
+      CANCELADA: "estado-cancelada",
     };
     return estadoMap[estado] || "estado-borrador";
+  };
+
+  const mapEstadoToDisplay = (estado) => {
+    const mapeo = {
+      BORRADOR: "Borrador",
+      EN_VALIDACION: "En validación",
+      APROBADA: "Aprobada",
+      RECHAZADA: "Rechazada",
+      CANCELADA: "Cancelada",
+    };
+    return mapeo[estado] || estado;
+  };
+
+  const mapEstadoToBackend = (estadoFrontend) => {
+    const mapeo = {
+      Borrador: "BORRADOR",
+      "En validación": "EN_VALIDACION",
+      Aprobada: "APROBADA",
+      Rechazada: "RECHAZADA",
+      Cancelada: "CANCELADA",
+    };
+    return mapeo[estadoFrontend] || estadoFrontend;
   };
 
   return (
@@ -124,7 +167,6 @@ export default function SolicitudesList() {
       <div className="solicitudes-header">
         <h2>Mis Solicitudes CDT</h2>
         <button className="btn-new-solicitud" onClick={() => setShowForm(true)}>
-          <span>➕</span>
           Nueva Solicitud
         </button>
       </div>
@@ -180,7 +222,9 @@ export default function SolicitudesList() {
         /* Solicitudes Grid */
         <div className="solicitudes-grid">
           {filteredSolicitudes.map((solicitud) => {
-            const esBorrador = solicitud.estado === "Borrador";
+            const esBorrador = solicitud.estado === "BORRADOR";
+            const esEnValidacion = solicitud.estado === "EN_VALIDACION";
+            const plazoEnDias = solicitud.plazoMeses * 30;
 
             return (
               <div
@@ -189,13 +233,15 @@ export default function SolicitudesList() {
                 onClick={() => navigate(`/solicitudes/${solicitud.id}`)}
               >
                 <div className="solicitud-header">
-                  <span className="solicitud-id">ID: {solicitud.id}</span>
+                  <span className="solicitud-id">
+                    ID: {solicitud.id.slice(0, 8)}
+                  </span>
                   <span
                     className={`estado-badge ${getEstadoBadgeClass(
-                      solicitud.estado,
+                      solicitud.estado
                     )}`}
                   >
-                    {solicitud.estado}
+                    {mapEstadoToDisplay(solicitud.estado)}
                   </span>
                 </div>
 
@@ -208,27 +254,21 @@ export default function SolicitudesList() {
                   <div className="detail-row">
                     <span className="detail-label">Plazo</span>
                     <span className="detail-value">
-                      {solicitud.plazoMeses
-                        ? solicitud.plazoMeses * 30
-                        : solicitud.plazo}{" "}
-                      días
+                      {plazoEnDias} días
                     </span>
                   </div>
                   <div className="detail-row">
                     <span className="detail-label">Fecha creación</span>
                     <span className="detail-value">
-                      {formatDate(
-                        solicitud.createdAt || solicitud.fechaCreacion,
-                      )}
+                      {formatDate(solicitud.createdAt || solicitud.fechaCreacion)}
                     </span>
                   </div>
 
-                  {/* Mostrar tasaInteres correctamente */}
-                  {(solicitud.tasaInteres || solicitud.tasa) && (
+                  {solicitud.tasaInteres && Number(solicitud.tasaInteres) > 0 && (
                     <div className="detail-row">
                       <span className="detail-label">Tasa</span>
                       <span className="detail-value">
-                        {solicitud.tasaInteres ?? solicitud.tasa}% EA
+                        {solicitud.tasaInteres}% EA
                       </span>
                     </div>
                   )}
@@ -238,45 +278,63 @@ export default function SolicitudesList() {
                   className="solicitud-actions"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  {/* Botón Editar - Solo para Borrador */}
+                  {/* Botón Editar - Solo para BORRADOR */}
                   <button
                     className="btn-edit"
                     onClick={() =>
                       navigate(`/solicitudes/edit/${solicitud.id}`)
                     }
-                    disabled={false}
+                    disabled={!esBorrador}
                     title={
                       !esBorrador
                         ? "Solo se pueden editar solicitudes en Borrador"
                         : "Editar solicitud"
                     }
                   >
-                    ✏️ Editar
+                    Editar
                   </button>
 
-                  {/* Botón Enviar - Solo para Borrador */}
+                  {/* Botón Enviar - Solo para BORRADOR */}
                   {esBorrador && (
                     <button
                       className="btn-send"
                       onClick={() => handleEnviarValidacion(solicitud)}
                     >
-                      📤 Enviar
+                      Enviar
                     </button>
                   )}
 
-                  {/* Botón Eliminar - Solo para Borrador */}
-                  <button
-                    className="btn-delete"
-                    onClick={() => handleDelete(solicitud.id)}
-                    disabled={false}
-                    title={
-                      !esBorrador
-                        ? "Solo se pueden eliminar solicitudes en Borrador"
-                        : "Eliminar solicitud"
-                    }
-                  >
-                    🗑️ Eliminar
-                  </button>
+                  {/* Botón Eliminar - Solo para BORRADOR */}
+                  {esBorrador && (
+                    <button
+                      className="btn-delete"
+                      onClick={() => handleDelete(solicitud.id)}
+                      title="Eliminar solicitud"
+                    >
+                      Eliminar
+                    </button>
+                  )}
+
+                  {/* Botón Cancelar - Solo para EN_VALIDACION */}
+                  {esEnValidacion && (
+                    <button
+                      className="btn-cancel"
+                      onClick={() => handleCancelar(solicitud)}
+                      title="Cancelar solicitud en validación"
+                      style={{
+                        background: "linear-gradient(135deg, #FF9800, #FFB74D)",
+                        color: "white",
+                        border: "none",
+                        padding: "0.5rem 1rem",
+                        borderRadius: "var(--radius-md)",
+                        fontWeight: "600",
+                        cursor: "pointer",
+                        transition: "all 0.3s ease",
+                      }}
+                    >
+                      Cancelar
+                    </button>
+                  )}
                 </div>
               </div>
             );
