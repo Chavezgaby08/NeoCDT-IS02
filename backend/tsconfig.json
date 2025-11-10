@@ -20,8 +20,8 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "types": ["node", "jest"]
+    "types": ["node", "jest", "@types/jest"]
   },
-  "include": ["src/**/*", "prisma/seed.ts"],
-  "exclude": ["node_modules", "dist", "tests"]
+  "include": ["src/**/*", "prisma/seed.ts", "tests/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

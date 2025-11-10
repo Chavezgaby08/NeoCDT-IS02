@@ -1,12 +1,13 @@
-import { PrismaClient } from '@prisma/client';
+import "@jest/globals";
+import { prismaMock } from "./_mocks_/prismaClient";
 
-const prisma = new PrismaClient();
-
-beforeAll(async () => {
+beforeEach(() => {
+  jest.clearAllMocks();
+  jest.resetAllMocks();
 });
 
-afterAll(async () => {
-  await prisma.$disconnect();
+afterAll(() => {
+  jest.restoreAllMocks();
 });
 
-export { prisma };
+export { prismaMock as prisma };
