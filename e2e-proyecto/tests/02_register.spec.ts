@@ -32,6 +32,7 @@ test.describe("Registro de usuario", () => {
               id: 1,
               email: submittedEmail,
               name: submittedName,
+              rol: "CLIENTE",
             },
           },
         });

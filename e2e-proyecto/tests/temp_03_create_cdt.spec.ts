@@ -89,11 +89,14 @@ test.describe("Crear solicitud de CDT", () => {
           response.url().includes("/api/solicitudes") &&
           response.request().method() === "POST"
       ),
+      page.waitForSelector(".modal-overlay", { state: "attached" }),
       page.locator('.form-solicitud button[type="submit"]').click(),
     ]);
 
-    // Esperar a que el modal se cierre y la lista se actualice
+    // Esperar a que el modal desaparezca completamente
     await page.waitForSelector(".modal-overlay", { state: "detached" });
+
+    // Esperar a que aparezca la tarjeta de solicitud y verificar su contenido
     await page.waitForSelector(".solicitud-card");
 
     // Verificar que se creó la solicitud con el estado correcto

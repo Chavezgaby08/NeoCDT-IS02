@@ -22,14 +22,14 @@ test.describe("Aprobar o rechazar solicitudes", () => {
             id: 2,
             email: "agente@test.com",
             name: "Agente Test",
-            role: "AGENTE",
+            rol: "AGENTE",
           },
         },
       });
     });
 
     // Mock obtener solicitud
-    await page.route("**/api/solicitudes/**", async (route) => {
+    await page.route("**/api/agente/solicitudes/**", async (route) => {
       await route.fulfill({
         status: 200,
         json: {
@@ -43,7 +43,7 @@ test.describe("Aprobar o rechazar solicitudes", () => {
     });
 
     // Mock aprobar/rechazar solicitud
-    await page.route("**/api/solicitudes/*/aprobar", async (route) => {
+    await page.route("**/api/agente/solicitudes/*/aprobar", async (route) => {
       await route.fulfill({
         status: 200,
         json: {
@@ -53,7 +53,7 @@ test.describe("Aprobar o rechazar solicitudes", () => {
       });
     });
 
-    await page.route("**/api/solicitudes/*/rechazar", async (route) => {
+    await page.route("**/api/agente/solicitudes/*/rechazar", async (route) => {
       const postData = route.request().postDataJSON();
       await route.fulfill({
         status: 200,

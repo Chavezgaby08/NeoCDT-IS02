@@ -19,7 +19,12 @@ test.describe("Listar y filtrar solicitudes", () => {
         status: 200,
         json: {
           token: "mock-jwt-token",
-          user: { id: 1, email: "usuario@test.com", name: "Usuario Test", rol: "CLIENTE" },
+          user: {
+            id: 1,
+            email: "usuario@test.com",
+            name: "Usuario Test",
+            rol: "CLIENTE",
+          },
         },
       });
     });
@@ -34,15 +39,15 @@ test.describe("Listar y filtrar solicitudes", () => {
         {
           id: 1,
           monto: 1000000,
-          plazo: 12,
-          estado: "Aprobada",
+          plazoMeses: 12,
+          estado: "APROBADA",
           fechaCreacion: "2025-01-15T10:00:00Z",
         },
         {
           id: 2,
           monto: 2000000,
-          plazo: 24,
-          estado: "Borrador",
+          plazoMeses: 24,
+          estado: "BORRADOR",
           fechaCreacion: "2025-01-20T15:30:00Z",
         },
       ];
@@ -79,15 +84,10 @@ test.describe("Listar y filtrar solicitudes", () => {
 
     // Verificar elementos de la lista usando selectores más robustos
     // El formato de moneda en la UI es local (ej. $1.000.000)
-    await expect(page.locator('[data-testid="monto-1"]')).toContainText(
-      "$1.000.000"
-    );
-    await expect(page.locator('[data-testid="estado-1"]')).toContainText(
-      "Aprobada"
-    );
-    await expect(page.locator('[data-testid="fecha-1"]')).toContainText(
-      "15/01/2025"
-    );
+    await page.waitForSelector('[class="solicitudes-grid"]');
+    await expect(page.locator(".solicitud-monto")).toContainText("$1.000.000");
+    await expect(page.locator(".estado-badge")).toContainText("Aprobada");
+    await expect(page.locator(".detail-value")).toContainText("15/01/2025");
   });
 
   // Escenario: Filtrar por estado
@@ -97,7 +97,7 @@ test.describe("Listar y filtrar solicitudes", () => {
     await page.goto("/solicitudes");
 
     // Aplicar filtro de estado usando selectores más robustos
-    await page.locator("#estado-filter").selectOption("Aprobada");
+    await page.locator("#estado-filter").selectOption("APROBADA");
 
     // Verificar resultados filtrados
     await expect(page.locator('[data-testid="estado-2"]')).not.toBeVisible();
