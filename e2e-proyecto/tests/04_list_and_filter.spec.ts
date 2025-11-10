@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { login } from "./utils/login";
 import process from "process";
 
 test.use({
@@ -18,7 +19,7 @@ test.describe("Listar y filtrar solicitudes", () => {
         status: 200,
         json: {
           token: "mock-jwt-token",
-          user: { id: 1, email: "usuario@test.com", name: "Usuario Test" },
+          user: { id: 1, email: "usuario@test.com", name: "Usuario Test", rol: "CLIENTE" },
         },
       });
     });
@@ -55,8 +56,8 @@ test.describe("Listar y filtrar solicitudes", () => {
         filtradas = filtradas.filter((s) => {
           const fecha = new Date(s.fechaCreacion);
           return (
-            fecha >= new Date(params.get("fechaDesde")) &&
-            fecha <= new Date(params.get("fechaHasta"))
+            fecha >= new Date(params.get("fechaDesde") ?? "") &&
+            fecha <= new Date(params.get("fechaHasta") ?? "")
           );
         });
       }
@@ -70,56 +71,57 @@ test.describe("Listar y filtrar solicitudes", () => {
 
   // Escenario: Visualización de solicitudes
   test("listar solicitudes y verificar datos", async ({ page }) => {
-    // Login previo
-    await page.goto("/login");
-    await page.getByLabel("Email").fill("usuario@test.com");
-    await page.getByLabel("Contraseña").fill("Password123!");
-    await page.getByRole("button", { name: "Ingresar" }).click();
+    // Login usando el utilitario
+    await login(page, "usuario@test.com", "Password123!");
 
     // Ir a la lista de solicitudes
     await page.goto("/solicitudes");
 
-    // Verificar elementos de la lista
-    await expect(page.getByText("$1,000,000")).toBeVisible();
-    await expect(page.getByText("Aprobada")).toBeVisible();
-    await expect(page.getByText("15/01/2025")).toBeVisible();
+    // Verificar elementos de la lista usando selectores más robustos
+    // El formato de moneda en la UI es local (ej. $1.000.000)
+    await expect(page.locator('[data-testid="monto-1"]')).toContainText(
+      "$1.000.000"
+    );
+    await expect(page.locator('[data-testid="estado-1"]')).toContainText(
+      "Aprobada"
+    );
+    await expect(page.locator('[data-testid="fecha-1"]')).toContainText(
+      "15/01/2025"
+    );
   });
 
   // Escenario: Filtrar por estado
   test("filtrar solicitudes por estado", async ({ page }) => {
-    // Login y navegación
-    await page.goto("/login");
-    await page.getByLabel("Email").fill("usuario@test.com");
-    await page.getByLabel("Contraseña").fill("Password123!");
-    await page.getByRole("button", { name: "Ingresar" }).click();
+    // Login usando el utilitario
+    await login(page, "usuario@test.com", "Password123!");
     await page.goto("/solicitudes");
 
-    // Aplicar filtro de estado
-    await page
-      .getByRole("combobox", { name: "Estado" })
-      .selectOption("Aprobada");
+    // Aplicar filtro de estado usando selectores más robustos
+    await page.locator("#estado-filter").selectOption("Aprobada");
 
     // Verificar resultados filtrados
-    await expect(page.getByText("Borrador")).not.toBeVisible();
-    await expect(page.getByText("Aprobada")).toBeVisible();
+    await expect(page.locator('[data-testid="estado-2"]')).not.toBeVisible();
+    await expect(page.locator('[data-testid="estado-1"]')).toBeVisible();
+    await expect(page.locator('[data-testid="estado-1"]')).toContainText(
+      "Aprobada"
+    );
   });
 
   // Escenario: Filtrar por rango de fechas
   test("filtrar solicitudes por rango de fechas", async ({ page }) => {
-    // Login y navegación
-    await page.goto("/login");
-    await page.getByLabel("Email").fill("usuario@test.com");
-    await page.getByLabel("Contraseña").fill("Password123!");
-    await page.getByRole("button", { name: "Ingresar" }).click();
+    // Login usando el utilitario
+    await login(page, "usuario@test.com", "Password123!");
     await page.goto("/solicitudes");
 
-    // Aplicar filtros de fecha
-    await page.getByLabel("Fecha desde").fill("2025-01-01");
-    await page.getByLabel("Fecha hasta").fill("2025-01-15");
-    await page.getByRole("button", { name: "Filtrar" }).click();
+    // Aplicar filtros de fecha usando selectores más robustos
+    await page.locator("#fecha-desde").fill("2025-01-01");
+    await page.locator("#fecha-hasta").fill("2025-01-15");
+    await page.locator("#filtrar-btn").click();
 
     // Verificar resultados filtrados
-    await expect(page.getByText("15/01/2025")).toBeVisible();
-    await expect(page.getByText("20/01/2025")).not.toBeVisible();
+    await expect(page.locator('[data-testid="fecha-1"]')).toContainText(
+      "15/01/2025"
+    );
+    await expect(page.locator('[data-testid="fecha-2"]')).not.toBeVisible();
   });
 });

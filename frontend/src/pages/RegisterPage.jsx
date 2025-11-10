@@ -1,8 +1,13 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useNavigate, Link } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function RegisterPage() {
+  useEffect(() => {
+    document.title = "Registro | BancoNex";
+  }, []);
+
   const { register } = useAuth();
   const [formData, setFormData] = useState({
     nombreCompleto: "",

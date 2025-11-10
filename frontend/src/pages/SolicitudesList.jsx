@@ -14,6 +14,8 @@ export default function SolicitudesList() {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [filterEstado, setFilterEstado] = useState("Todos");
+  const [fechaDesde, setFechaDesde] = useState("");
+  const [fechaHasta, setFechaHasta] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,14 +42,25 @@ export default function SolicitudesList() {
   };
 
   const filterSolicitudes = () => {
-    if (filterEstado === "Todos") {
-      setFilteredSolicitudes(solicitudes);
-    } else {
+    let filtered = [...solicitudes];
+
+    if (filterEstado !== "Todos") {
       const estadoBackend = mapEstadoToBackend(filterEstado);
-      setFilteredSolicitudes(
-        solicitudes.filter((s) => s.estado === estadoBackend)
-      );
+      filtered = filtered.filter((s) => s.estado === estadoBackend);
     }
+
+    if (fechaDesde && fechaHasta) {
+      filtered = filtered.filter((s) => {
+        const fecha = new Date(s.createdAt || s.fechaCreacion);
+        return fecha >= new Date(fechaDesde) && fecha <= new Date(fechaHasta);
+      });
+    }
+
+    setFilteredSolicitudes(filtered);
+  };
+
+  const handleFiltrarFechas = () => {
+    filterSolicitudes();
   };
 
   const handleCreate = async (solicitud) => {
@@ -121,10 +134,11 @@ export default function SolicitudesList() {
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
+    // Return DD/MM/YYYY to match E2E expectations
     return date.toLocaleDateString("es-CO", {
       year: "numeric",
-      month: "short",
-      day: "numeric",
+      month: "2-digit",
+      day: "2-digit",
     });
   };
 
@@ -175,8 +189,9 @@ export default function SolicitudesList() {
       <div className="filters-container">
         <div className="filters-grid">
           <div className="form-group">
-            <label>Filtrar por Estado</label>
+            <label htmlFor="estado-filter">Estado</label>
             <select
+              id="estado-filter"
               value={filterEstado}
               onChange={(e) => setFilterEstado(e.target.value)}
             >
@@ -188,6 +203,34 @@ export default function SolicitudesList() {
               <option value="Cancelada">Cancelada</option>
             </select>
           </div>
+
+          <div className="form-group">
+            <label htmlFor="fecha-desde">Fecha desde</label>
+            <input
+              type="date"
+              id="fecha-desde"
+              name="fecha-desde"
+              onChange={(e) => setFechaDesde(e.target.value)}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="fecha-hasta">Fecha hasta</label>
+            <input
+              type="date"
+              id="fecha-hasta"
+              name="fecha-hasta"
+              onChange={(e) => setFechaHasta(e.target.value)}
+            />
+          </div>
+
+          <button
+            id="filtrar-btn"
+            className="btn-filter"
+            onClick={handleFiltrarFechas}
+          >
+            Filtrar
+          </button>
         </div>
       </div>
 
@@ -240,12 +283,16 @@ export default function SolicitudesList() {
                     className={`estado-badge ${getEstadoBadgeClass(
                       solicitud.estado
                     )}`}
+                    data-testid={`estado-${solicitud.id}`}
                   >
                     {mapEstadoToDisplay(solicitud.estado)}
                   </span>
                 </div>
 
-                <div className="solicitud-monto">
+                <div
+                  className="solicitud-monto"
+                  data-testid={`monto-${solicitud.id}`}
+                >
                   <span className="currency">$</span>
                   {formatCurrency(solicitud.monto).replace(/[^\d.,]/g, "")}
                 </div>
@@ -253,25 +300,29 @@ export default function SolicitudesList() {
                 <div className="solicitud-details">
                   <div className="detail-row">
                     <span className="detail-label">Plazo</span>
-                    <span className="detail-value">
-                      {plazoEnDias} días
-                    </span>
+                    <span className="detail-value">{plazoEnDias} días</span>
                   </div>
                   <div className="detail-row">
                     <span className="detail-label">Fecha creación</span>
-                    <span className="detail-value">
-                      {formatDate(solicitud.createdAt || solicitud.fechaCreacion)}
+                    <span
+                      className="detail-value"
+                      data-testid={`fecha-${solicitud.id}`}
+                    >
+                      {formatDate(
+                        solicitud.createdAt || solicitud.fechaCreacion
+                      )}
                     </span>
                   </div>
 
-                  {solicitud.tasaInteres && Number(solicitud.tasaInteres) > 0 && (
-                    <div className="detail-row">
-                      <span className="detail-label">Tasa</span>
-                      <span className="detail-value">
-                        {solicitud.tasaInteres}% EA
-                      </span>
-                    </div>
-                  )}
+                  {solicitud.tasaInteres &&
+                    Number(solicitud.tasaInteres) > 0 && (
+                      <div className="detail-row">
+                        <span className="detail-label">Tasa</span>
+                        <span className="detail-value">
+                          {solicitud.tasaInteres}% EA
+                        </span>
+                      </div>
+                    )}
                 </div>
 
                 <div

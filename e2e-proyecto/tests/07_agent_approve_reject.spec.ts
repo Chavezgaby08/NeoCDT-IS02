@@ -70,9 +70,11 @@ test.describe("Aprobar o rechazar solicitudes", () => {
   test("aprobar solicitud como agente", async ({ page }) => {
     // Login como agente
     await page.goto("/login");
-    await page.getByLabel("Email").fill("agente@test.com");
-    await page.getByLabel("Contraseña").fill("Password123!");
-    await page.getByRole("button", { name: "Ingresar" }).click();
+    await page.waitForSelector(".login-card");
+    await page.locator("#email").fill("agente@test.com");
+    await page.locator("#password").fill("Password123!");
+    // Use the submit button selector used in the app
+    await page.locator('.login-card button[type="submit"]').click();
 
     // Ir al detalle de la solicitud
     await page.goto("/solicitudes/1");
@@ -94,9 +96,9 @@ test.describe("Aprobar o rechazar solicitudes", () => {
   test("rechazar solicitud con observación", async ({ page }) => {
     // Login como agente
     await page.goto("/login");
-    await page.getByLabel("Email").fill("agente@test.com");
-    await page.getByLabel("Contraseña").fill("Password123!");
-    await page.getByRole("button", { name: "Ingresar" }).click();
+    await page.locator("#email").fill("agente@test.com");
+    await page.locator("#password").fill("Password123!");
+    await page.locator('.login-card button[type="submit"]').click();
 
     // Ir al detalle de la solicitud
     await page.goto("/solicitudes/1");

@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import process from "process";
+import { login } from "./utils/login";
 
 test.use({
   baseURL:
@@ -18,18 +19,33 @@ test.describe("Crear solicitud de CDT", () => {
         status: 200,
         json: {
           token: "mock-jwt-token",
-          user: { id: 1, email: "usuario@test.com", name: "Usuario Test" },
+          user: {
+            id: 1,
+            email: "usuario@test.com",
+            name: "Usuario Test",
+            rol: "CLIENTE",
+          },
         },
       });
     });
 
-    // Mock creación de solicitud
+    // Mock listado y creación de solicitudes
     await page.route("**/api/solicitudes", async (route) => {
-      const request = route.request();
-      const postData = request.postDataJSON();
+      const req = route.request();
+      const method = req.method();
 
-      // Validar datos de la solicitud
-      if (postData.monto && postData.plazo) {
+      if (method === "GET") {
+        // Devolver lista base
+        await route.fulfill({
+          status: 200,
+          json: [],
+        });
+        return;
+      }
+
+      // POST -> crear
+      const postData = req.postDataJSON();
+      if (postData && postData.monto && postData.plazo) {
         await route.fulfill({
           status: 201,
           json: {
@@ -52,19 +68,18 @@ test.describe("Crear solicitud de CDT", () => {
   // Escenario: Creación exitosa
   test("crear solicitud CDT con datos válidos", async ({ page }) => {
     // Login previo (necesario para acceder al formulario)
-    await page.goto("/login");
-    await page.getByLabel("Email").fill("usuario@test.com");
-    await page.getByLabel("Contraseña").fill("Password123!");
-    await page.getByRole("button", { name: "Ingresar" }).click();
+    await login(page, "usuario@test.com", "Password123!");
 
-    // Navegar al formulario de creación
-    await page.goto("/solicitudes/nueva");
-    await expect(page).toHaveTitle(/Nueva Solicitud/);
+    // Navegar al formulario de creación y esperar a que la página cargue
+    await page.goto("/solicitudes");
+    await page.getByRole("button", { name: /nueva solicitud/i }).click();
 
-    // Completar formulario
-    await page.getByLabel("Monto").fill("1000000");
-    await page.getByLabel("Plazo (meses)").fill("12");
-    await page.getByLabel("Tasa").fill("12.5");
+    // Esperar a que el modal del formulario sea visible
+    await page.waitForSelector(".form-solicitud");
+
+    // Completar formulario usando selectores más robustos
+    await page.getByLabel(/monto a invertir/i).fill("1000000");
+    await page.getByLabel(/plazo \(días\)/i).fill("360"); // 12 meses = 360 días
 
     // Submit y esperar redirección
     await Promise.all([
@@ -80,20 +95,19 @@ test.describe("Crear solicitud de CDT", () => {
   // Escenario: Creación con datos inválidos
   test("mostrar errores con campos vacíos", async ({ page }) => {
     // Login previo
-    await page.goto("/login");
-    await page.getByLabel("Email").fill("usuario@test.com");
-    await page.getByLabel("Contraseña").fill("Password123!");
-    await page.getByRole("button", { name: "Ingresar" }).click();
+    await login(page, "usuario@test.com", "Password123!");
 
-    // Navegar al formulario de creación
-    await page.goto("/solicitudes/nueva");
+    // Navegar al formulario y esperar a que cargue
+    await page.goto("/solicitudes");
+    await page.getByRole("button", { name: /nueva solicitud/i }).click();
+    await page.waitForSelector(".form-solicitud");
 
     // Click en guardar sin llenar campos
-    await page.getByRole("button", { name: "Guardar" }).click();
+    await page.getByRole("button", { name: /crear solicitud/i }).click();
 
     // Verificar mensajes de validación
-    await expect(page.getByText("El monto es requerido")).toBeVisible();
-    await expect(page.getByText("El plazo es requerido")).toBeVisible();
+    await expect(page.getByText(/el monto debe ser mayor a 0/i)).toBeVisible();
+    await expect(page.getByText(/el plazo debe ser mayor a 0/i)).toBeVisible();
 
     // Verificar que seguimos en el formulario
     await expect(page).toHaveURL(/.*nueva/);

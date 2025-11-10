@@ -20,9 +20,11 @@ test.describe("Login de usuario", () => {
       const request = route.request();
       const postData = request.postDataJSON();
 
+      // Validar credenciales mock (aceptar tanto 'email' como 'username')
+      const submittedEmail = postData.email ?? postData.username;
       // Validar credenciales mock
       if (
-        postData.email === "usuario@test.com" &&
+        submittedEmail === "usuario@test.com" &&
         postData.password === "Password123!"
       ) {
         await route.fulfill({
@@ -33,6 +35,7 @@ test.describe("Login de usuario", () => {
               id: 1,
               email: "usuario@test.com",
               name: "Usuario Test",
+              rol: "CLIENTE",
             },
           },
         });
@@ -49,21 +52,28 @@ test.describe("Login de usuario", () => {
   test("login exitoso con credenciales válidas", async ({ page }) => {
     // Navegar a la página de login
     await page.goto("/login");
-    await expect(page).toHaveTitle(/Login/);
+    await expect(page).toHaveTitle("Login | BancoNex");
+
+    // Esperar a que el formulario sea visible
+    await page.waitForSelector(".login-card");
 
     // Ingresar credenciales válidas
-    await page.getByLabel("Email").fill("usuario@test.com");
-    await page.getByLabel("Contraseña").fill("Password123!");
+    await page.locator("#email").fill("usuario@test.com");
+    await page.locator("#password").fill("Password123!");
 
     // Submit y esperar redirección
-    await Promise.all([
-      page.waitForURL("/dashboard"),
-      page.getByRole("button", { name: "Ingresar" }).click(),
-    ]);
+    await page.waitForSelector('.login-card button[type="submit"]');
+    await page.locator('.login-card button[type="submit"]').click();
+    await page.waitForURL("/dashboard");
 
     // Verificar redirección exitosa
     await expect(page).toHaveURL(/.*dashboard/);
-    await expect(page.getByText("Bienvenido")).toBeVisible();
+    // Verificar que el login guardó token y usuario en localStorage
+    const token = await page.evaluate(() => localStorage.getItem("token"));
+    const userJson = await page.evaluate(() => localStorage.getItem("user"));
+    const user = userJson ? JSON.parse(userJson) : null;
+    expect(token).toBeTruthy();
+    expect(user?.email || user?.username).toBe("usuario@test.com");
   });
 
   // Escenario: Login fallido
@@ -71,12 +81,16 @@ test.describe("Login de usuario", () => {
     // Navegar a la página de login
     await page.goto("/login");
 
+    // Esperar a que el formulario sea visible
+    await page.waitForSelector(".login-card");
+
     // Ingresar credenciales inválidas
-    await page.getByLabel("Email").fill("incorrecto@test.com");
+    await page.getByLabel("Correo electrónico").fill("incorrecto@test.com");
     await page.getByLabel("Contraseña").fill("ClaveIncorrecta123");
 
     // Submit y esperar mensaje de error
-    await page.getByRole("button", { name: "Ingresar" }).click();
+    // botón en UI es 'Iniciar Sesión' — usar selector del formulario
+    await page.locator('.login-card button[type="submit"]').click();
 
     // Verificar mensaje de error y que seguimos en login
     await expect(page.getByText("Credenciales inválidas")).toBeVisible();

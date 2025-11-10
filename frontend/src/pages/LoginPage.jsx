@@ -1,8 +1,13 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useNavigate, Link } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function LoginPage() {
+  useEffect(() => {
+    document.title = "Login | BancoNex";
+  }, []);
+
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
