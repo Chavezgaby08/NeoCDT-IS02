@@ -206,16 +206,215 @@ describe("AgenteService", () => {
       const currentDate = new Date("2023-11-15");
       jest.useFakeTimers().setSystemTime(currentDate);
 
+      const mockSolicitudConPlazo = {
+        ...mockSolicitud,
+        plazoMeses: 6,
+      };
+
       (prismaMock.solicitudCDT.findUnique as jest.Mock).mockResolvedValueOnce(
-        mockSolicitud
+        mockSolicitudConPlazo
       );
 
-      const expectedFechaVencimiento = new Date("2024-11-15"); // 12 meses después
+      const expectedFechaVencimiento = new Date("2024-05-15"); // 6 meses después
 
       (prismaMock.solicitudCDT.update as jest.Mock).mockImplementation(
         (params) => {
           return Promise.resolve({
-            ...mockSolicitud,
+            ...mockSolicitudConPlazo,
+            ...params.data,
+          });
+        }
+      );
+
+      // Act
+      const result = await service.aprobarSolicitud(
+        mockSolicitudId,
+        mockAgenteId,
+        6,
+        "Aprobado"
+      );
+
+      // Assert
+      expect(result.fechaApertura).toEqual(currentDate);
+      expect(result.fechaVencimiento).toEqual(expectedFechaVencimiento);
+      expect(prismaMock.solicitudCDT.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            fechaApertura: currentDate,
+            fechaVencimiento: expectedFechaVencimiento,
+          }),
+        })
+      );
+
+      jest.useRealTimers();
+    });
+
+    it("should handle month rollover correctly when calculating fechaVencimiento", async () => {
+      // Arrange
+      const currentDate = new Date("2023-12-15");
+      jest.useFakeTimers().setSystemTime(currentDate);
+
+      const mockSolicitudConPlazo = {
+        ...mockSolicitud,
+        plazoMeses: 3,
+      };
+
+      (prismaMock.solicitudCDT.findUnique as jest.Mock).mockResolvedValueOnce(
+        mockSolicitudConPlazo
+      );
+
+      const expectedFechaVencimiento = new Date("2024-03-15"); // 3 meses después, cruzando año
+
+      (prismaMock.solicitudCDT.update as jest.Mock).mockImplementation(
+        (params) => {
+          return Promise.resolve({
+            ...mockSolicitudConPlazo,
+            ...params.data,
+          });
+        }
+      );
+
+      // Act
+      const result = await service.aprobarSolicitud(
+        mockSolicitudId,
+        mockAgenteId,
+        6,
+        "Aprobado"
+      );
+
+      // Assert
+      expect(result.fechaApertura).toEqual(currentDate);
+      expect(result.fechaVencimiento).toEqual(expectedFechaVencimiento);
+      expect(prismaMock.solicitudCDT.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            fechaApertura: currentDate,
+            fechaVencimiento: expectedFechaVencimiento,
+          }),
+        })
+      );
+
+      jest.useRealTimers();
+    });
+
+    it("should handle large month values correctly when calculating fechaVencimiento", async () => {
+      // Arrange
+      const currentDate = new Date("2023-12-15");
+      jest.useFakeTimers().setSystemTime(currentDate);
+
+      const mockSolicitudConPlazoLargo = {
+        ...mockSolicitud,
+        plazoMeses: 36, // 3 años
+      };
+
+      (prismaMock.solicitudCDT.findUnique as jest.Mock).mockResolvedValueOnce(
+        mockSolicitudConPlazoLargo
+      );
+
+      const expectedFechaVencimiento = new Date("2026-12-15"); // 36 meses después
+
+      (prismaMock.solicitudCDT.update as jest.Mock).mockImplementation(
+        (params) => {
+          return Promise.resolve({
+            ...mockSolicitudConPlazoLargo,
+            ...params.data,
+          });
+        }
+      );
+
+      // Act
+      const result = await service.aprobarSolicitud(
+        mockSolicitudId,
+        mockAgenteId,
+        6,
+        "Aprobado"
+      );
+
+      // Assert
+      expect(result.fechaApertura).toEqual(currentDate);
+      expect(result.fechaVencimiento).toEqual(expectedFechaVencimiento);
+      expect(prismaMock.solicitudCDT.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            fechaApertura: currentDate,
+            fechaVencimiento: expectedFechaVencimiento,
+          }),
+        })
+      );
+
+      jest.useRealTimers();
+    });
+
+    it("should handle extremely large month values that cause year overflow", async () => {
+      // Arrange
+      const currentDate = new Date("2023-12-15");
+      jest.useFakeTimers().setSystemTime(currentDate);
+
+      const mockSolicitudConPlazoExtremo = {
+        ...mockSolicitud,
+        plazoMeses: 1200, // 100 años
+      };
+
+      (prismaMock.solicitudCDT.findUnique as jest.Mock).mockResolvedValueOnce(
+        mockSolicitudConPlazoExtremo
+      );
+
+      const expectedFechaVencimiento = new Date("2123-12-15"); // 100 años después
+
+      (prismaMock.solicitudCDT.update as jest.Mock).mockImplementation(
+        (params) => {
+          return Promise.resolve({
+            ...mockSolicitudConPlazoExtremo,
+            ...params.data,
+          });
+        }
+      );
+
+      // Act
+      const result = await service.aprobarSolicitud(
+        mockSolicitudId,
+        mockAgenteId,
+        6,
+        "Aprobado"
+      );
+
+      // Assert
+      expect(result.fechaApertura).toEqual(currentDate);
+      expect(result.fechaVencimiento).toEqual(expectedFechaVencimiento);
+      expect(prismaMock.solicitudCDT.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            fechaApertura: currentDate,
+            fechaVencimiento: expectedFechaVencimiento,
+          }),
+        })
+      );
+
+      jest.useRealTimers();
+    });
+
+    it("should handle month and year transitions correctly", async () => {
+      // Arrange
+      const currentDate = new Date("2023-01-31"); // Último día de enero
+      jest.useFakeTimers().setSystemTime(currentDate);
+
+      const mockSolicitudConPlazo = {
+        ...mockSolicitud,
+        plazoMeses: 1, // 1 mes para probar transición específica
+      };
+
+      (prismaMock.solicitudCDT.findUnique as jest.Mock).mockResolvedValueOnce(
+        mockSolicitudConPlazo
+      );
+
+      // La fecha de vencimiento será el 3 de marzo debido a cómo JavaScript maneja
+      // el cambio de meses cuando el día es mayor que el número de días en el mes destino
+      const expectedFechaVencimiento = new Date("2023-03-03");
+
+      (prismaMock.solicitudCDT.update as jest.Mock).mockImplementation(
+        (params) => {
+          return Promise.resolve({
+            ...mockSolicitudConPlazo,
             ...params.data,
           });
         }
