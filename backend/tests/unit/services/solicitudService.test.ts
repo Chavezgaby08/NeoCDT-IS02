@@ -191,6 +191,54 @@ describe("SolicitudService", () => {
       });
     });
 
+    it("should create solicitud with default tasa interes when not provided", async () => {
+      // Arrange
+      const dataWithoutTasa = {
+        monto: 1000000,
+        plazoMeses: 12,
+      };
+
+      const mockNewSolicitud = {
+        id: mockSolicitudId,
+        clienteId: mockClienteId,
+        ...dataWithoutTasa,
+        tasaInteres: 0,
+        estado: "BORRADOR",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      (prismaMock.cliente.findUnique as jest.Mock).mockResolvedValueOnce({
+        id: mockClienteId,
+        usuarioId: mockUsuarioId,
+      });
+
+      (prismaMock.solicitudCDT.create as jest.Mock).mockResolvedValueOnce(
+        mockNewSolicitud
+      );
+      (prismaMock.historialEstado.create as jest.Mock).mockResolvedValueOnce(
+        {}
+      );
+
+      // Act
+      const result = await service.createSolicitud(
+        dataWithoutTasa,
+        mockUsuarioId
+      );
+
+      // Assert
+      expect(result).toEqual(mockNewSolicitud);
+      expect(prismaMock.solicitudCDT.create).toHaveBeenCalledWith({
+        data: {
+          clienteId: mockClienteId,
+          monto: dataWithoutTasa.monto,
+          plazoMeses: dataWithoutTasa.plazoMeses,
+          tasaInteres: 0,
+          estado: "BORRADOR",
+        },
+      });
+    });
+
     it("should throw error if client is not found", async () => {
       // Arrange
       (prismaMock.cliente.findUnique as jest.Mock).mockResolvedValueOnce(null);

@@ -1,7 +1,10 @@
-import { PrismaClient } from "@prisma/client";
+type MockPrismaClient = {
+  $connect: jest.Mock;
+  $disconnect: jest.Mock;
+  _config?: any;
+};
 
-// Configurar un mock inicial para PrismaClient
-let mockPrismaInstance: any;
+let mockPrismaInstance: MockPrismaClient;
 let mockPrismaConstructor: jest.Mock;
 
 jest.mock("@prisma/client", () => {

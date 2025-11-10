@@ -10,13 +10,13 @@ const mockHashPassword = jest.fn();
 const mockComparePassword = jest.fn();
 jest.mock("../../../src/utils/bcrypt", () => ({
   hashPassword: (...args: any[]) => mockHashPassword(...args),
-  comparePassword: (...args: any[]) => mockComparePassword(...args)
+  comparePassword: (...args: any[]) => mockComparePassword(...args),
 }));
 
 // Mock jwt utils
 const mockGenerateToken = jest.fn();
 jest.mock("../../../src/utils/jwt", () => ({
-  generateToken: (...args: any[]) => mockGenerateToken(...args)
+  generateToken: (...args: any[]) => mockGenerateToken(...args),
 }));
 
 describe("AuthService", () => {
@@ -34,8 +34,50 @@ describe("AuthService", () => {
       nombreCompleto: "John Doe",
       cedula: "1234567890",
       telefono: "1234567890",
-      username: "johndoe123"
+      username: "johndoe123",
     };
+
+    it("should register a user with single name", async () => {
+      // Arrange
+      const singleNameData = {
+        ...validRegisterData,
+        nombreCompleto: "John",
+      };
+      const hashedPassword = "hashed_password";
+      prismaMock.usuario.findFirst.mockResolvedValueOnce(null);
+      mockHashPassword.mockResolvedValueOnce(hashedPassword);
+      prismaMock.usuario.create.mockResolvedValueOnce({
+        id: "1",
+        email: singleNameData.correo,
+        password: hashedPassword,
+        rol: "CLIENTE" as RolUsuario,
+        activo: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      // Act
+      const result = await service.register(singleNameData);
+
+      // Assert
+      expect(result.success).toBe(true);
+      expect(prismaMock.usuario.create).toHaveBeenCalledWith({
+        data: {
+          email: singleNameData.correo,
+          password: hashedPassword,
+          rol: "CLIENTE",
+          cliente: {
+            create: {
+              nombres: "John",
+              apellidos: "John", // Debería usar el mismo nombre como apellido
+              tipoDocumento: "CC",
+              numeroDocumento: singleNameData.cedula,
+              telefono: singleNameData.telefono,
+            },
+          },
+        },
+      });
+    });
 
     it("should register a new user successfully", async () => {
       // Arrange
@@ -49,7 +91,7 @@ describe("AuthService", () => {
         rol: "CLIENTE" as RolUsuario,
         activo: true,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       });
 
       // Act
@@ -62,9 +104,9 @@ describe("AuthService", () => {
         where: {
           OR: [
             { email: validRegisterData.correo },
-            { cliente: { numeroDocumento: validRegisterData.cedula } }
-          ]
-        }
+            { cliente: { numeroDocumento: validRegisterData.cedula } },
+          ],
+        },
       });
       expect(mockHashPassword).toHaveBeenCalledWith(validRegisterData.password);
       expect(prismaMock.usuario.create).toHaveBeenCalledWith({
@@ -78,10 +120,10 @@ describe("AuthService", () => {
               apellidos: "Doe",
               tipoDocumento: "CC",
               numeroDocumento: validRegisterData.cedula,
-              telefono: validRegisterData.telefono
-            }
-          }
-        }
+              telefono: validRegisterData.telefono,
+            },
+          },
+        },
       });
     });
 
@@ -94,7 +136,7 @@ describe("AuthService", () => {
         rol: "CLIENTE" as RolUsuario,
         activo: true,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       });
 
       // Act & Assert
@@ -109,7 +151,7 @@ describe("AuthService", () => {
   describe("login", () => {
     const validLoginData = {
       username: "test@example.com",
-      password: "password123"
+      password: "password123",
     };
 
     const mockUser = {
@@ -119,7 +161,7 @@ describe("AuthService", () => {
       rol: "CLIENTE" as RolUsuario,
       activo: true,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     it("should login successfully with valid credentials", async () => {
@@ -137,11 +179,11 @@ describe("AuthService", () => {
       expect(result.user).toEqual({
         id: mockUser.id,
         email: mockUser.email,
-        rol: mockUser.rol
+        rol: mockUser.rol,
       });
       expect(result.token).toBe(mockToken);
       expect(prismaMock.usuario.findUnique).toHaveBeenCalledWith({
-        where: { email: validLoginData.username }
+        where: { email: validLoginData.username },
       });
       expect(mockComparePassword).toHaveBeenCalledWith(
         validLoginData.password,
@@ -150,7 +192,7 @@ describe("AuthService", () => {
       expect(mockGenerateToken).toHaveBeenCalledWith({
         id: mockUser.id,
         email: mockUser.email,
-        rol: mockUser.rol
+        rol: mockUser.rol,
       });
     });
 
@@ -182,7 +224,7 @@ describe("AuthService", () => {
       // Arrange
       prismaMock.usuario.findUnique.mockResolvedValueOnce({
         ...mockUser,
-        activo: false
+        activo: false,
       });
       mockComparePassword.mockResolvedValueOnce(true);
 

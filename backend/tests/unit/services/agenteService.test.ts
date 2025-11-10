@@ -201,6 +201,89 @@ describe("AgenteService", () => {
       });
     });
 
+    it("should calculate correct dates when approving solicitud", async () => {
+      // Arrange
+      const currentDate = new Date("2023-11-15");
+      jest.useFakeTimers().setSystemTime(currentDate);
+
+      (prismaMock.solicitudCDT.findUnique as jest.Mock).mockResolvedValueOnce(
+        mockSolicitud
+      );
+
+      const expectedFechaVencimiento = new Date("2024-11-15"); // 12 meses después
+
+      (prismaMock.solicitudCDT.update as jest.Mock).mockImplementation(
+        (params) => {
+          return Promise.resolve({
+            ...mockSolicitud,
+            ...params.data,
+          });
+        }
+      );
+
+      // Act
+      const result = await service.aprobarSolicitud(
+        mockSolicitudId,
+        mockAgenteId,
+        6,
+        "Aprobado"
+      );
+
+      // Assert
+      expect(result.fechaApertura).toEqual(currentDate);
+      expect(result.fechaVencimiento).toEqual(expectedFechaVencimiento);
+      expect(prismaMock.solicitudCDT.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            fechaApertura: currentDate,
+            fechaVencimiento: expectedFechaVencimiento,
+          }),
+        })
+      );
+
+      jest.useRealTimers();
+    });
+
+    it("should keep existing tasa interes when not provided in approval", async () => {
+      // Arrange
+      const existingTasaInteres = 5;
+      const mockSolicitudConTasa = {
+        ...mockSolicitud,
+        tasaInteres: existingTasaInteres,
+      };
+
+      (prismaMock.solicitudCDT.findUnique as jest.Mock).mockResolvedValueOnce(
+        mockSolicitudConTasa
+      );
+
+      (prismaMock.solicitudCDT.update as jest.Mock).mockImplementation(
+        (params) => {
+          return Promise.resolve({
+            ...mockSolicitudConTasa,
+            ...params.data,
+          });
+        }
+      );
+
+      // Act
+      const result = await service.aprobarSolicitud(
+        mockSolicitudId,
+        mockAgenteId,
+        undefined,
+        "Aprobado sin cambio de tasa"
+      );
+
+      // Assert
+      expect(result.tasaInteres).toEqual(existingTasaInteres);
+      expect(prismaMock.solicitudCDT.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            tasaInteres: existingTasaInteres,
+          }),
+        })
+      );
+    });
+
     it("should throw error if solicitud is not found", async () => {
       // Arrange
       (prismaMock.solicitudCDT.findUnique as jest.Mock).mockResolvedValueOnce(
