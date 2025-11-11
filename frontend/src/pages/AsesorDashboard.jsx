@@ -32,7 +32,7 @@ export default function AsesorDashboard() {
                 montoTotalValidacion: data.montoTotalValidacion || 0,
             });
         } catch (error) {
-            console.error("Error cargando estadÃ­sticas:", error);
+            console.error("Error cargando estadi­sticas:", error);
             setStats({
                 totalSolicitudes: 0,
                 enValidacion: 0,
@@ -159,7 +159,7 @@ export default function AsesorDashboard() {
                 </div>
             )}
 
-            {/* Acciones RÃ¡pidas */}
+            {/* Acciones Rapidas */}
             <div className="dashboard-actions">
                 <button
                     className="btn-primary"
@@ -207,7 +207,7 @@ export default function AsesorDashboard() {
                     <li style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
                         <span className="resp-ico" aria-hidden="true">{"\uD83D\uDCCA"}</span>
                         <span style={{ color: "var(--gray-700)" }}>
-                            Asignar tasas de intereres competitivas según el plazo y monto
+                            Asignar tasas de interés competitivas según el plazo y monto
                         </span>
                     </li>
                     <li style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
