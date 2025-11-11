@@ -18,7 +18,6 @@ function buildBodyFromForm(input = {}) {
     meses = p >= 30 ? diasAmeses(p) : Math.max(1, p);
   }
 
-  // ✅ Ya NO enviamos tasaInteres (la asigna el asesor al aprobar)
   const body = {
     monto: montoNumber,
     plazoMeses: meses,
@@ -32,7 +31,7 @@ function buildBodyFromForm(input = {}) {
   return body;
 }
 
-// ✅ Obtener todas las solicitudes
+// Obtener todas las solicitudes
 export async function getSolicitudes(params = {}) {
   try {
     const { page = 1, pageSize = 10 } = params;
@@ -51,7 +50,7 @@ export async function getSolicitudes(params = {}) {
   }
 }
 
-// ✅ Obtener solicitud por ID
+// Obtener solicitud por ID
 export async function getSolicitudById(id) {
   try {
     const { data } = await api.get(`/solicitudes/${id}`);
@@ -67,7 +66,7 @@ export async function getSolicitudById(id) {
   }
 }
 
-// ✅ Crear nueva solicitud
+// Crear nueva solicitud
 export async function createSolicitud(formData) {
   try {
     const body = buildBodyFromForm(formData);
@@ -86,7 +85,7 @@ export async function createSolicitud(formData) {
   }
 }
 
-// ✅ Actualizar solicitud
+// Actualizar solicitud
 export async function updateSolicitud(id, formData) {
   try {
     const partial = {};
@@ -130,7 +129,7 @@ export async function updateSolicitud(id, formData) {
   }
 }
 
-// ✅ Eliminar solicitud
+// Eliminar solicitud
 export async function deleteSolicitud(id) {
   try {
     console.log("📤 Eliminando solicitud:", id);
@@ -156,7 +155,7 @@ export async function deleteSolicitud(id) {
   }
 }
 
-// ✅ Mapear estados frontend -> backend
+//Mapear estados frontend -> backend
 const mapEstadoToBackend = (estadoFrontend) => {
   const mapeo = {
     Borrador: "BORRADOR",
@@ -168,7 +167,7 @@ const mapEstadoToBackend = (estadoFrontend) => {
   return mapeo[estadoFrontend] || estadoFrontend;
 };
 
-// ✅ Función helper para debugging (opcional)
+// Función helper para debugging 
 export function logApiStatus() {
   console.log("🔍 Estado del servicio de solicitudes:");
   console.log("- baseURL:", api.defaults.baseURL);
