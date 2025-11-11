@@ -208,7 +208,7 @@ NEOCDT-IS02/
 - Configuración mínima
 - Excelente DX
 
-#### 3. **Arquitectura REST**
+#### 3. **Arquitectura MVC**
 **Por qué:**
 - Simplicidad y estándares establecidos
 - Fácil de testear y documentar
