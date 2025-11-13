@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { getEstadisticasAgente } from "../api/agenteService.js"
@@ -32,7 +32,7 @@ export default function AsesorDashboard() {
                 montoTotalValidacion: data.montoTotalValidacion || 0,
             });
         } catch (error) {
-            console.error("Error cargando estadísticas:", error);
+            console.error("Error cargando estadi­sticas:", error);
             setStats({
                 totalSolicitudes: 0,
                 enValidacion: 0,
@@ -55,7 +55,7 @@ export default function AsesorDashboard() {
     return (
         <div className="dashboard">
             <div className="dashboard-header">
-                <h2>Panel de Asesor 👨‍💼</h2>
+                <h2>Panel de Asesor</h2>
                 <p>¡Hola, {user?.email || "Asesor"}!</p>
                 <p style={{ color: "var(--gray-600)", marginTop: "0.5rem" }}>
                     Gestiona y valida las solicitudes de CDT de todos los clientes
@@ -159,7 +159,7 @@ export default function AsesorDashboard() {
                 </div>
             )}
 
-            {/* Acciones Rápidas */}
+            {/* Acciones Rapidas */}
             <div className="dashboard-actions">
                 <button
                     className="btn-primary"
@@ -187,18 +187,8 @@ export default function AsesorDashboard() {
             </div>
 
             {/* Información adicional */}
-            <div
-                style={{
-                    marginTop: "3rem",
-                    background: "white",
-                    padding: "2rem",
-                    borderRadius: "var(--radius-lg)",
-                    boxShadow: "var(--shadow-md)",
-                }}
-            >
-                <h3 style={{ marginBottom: "1rem", color: "var(--gray-900)" }}>
-                    📋 Tus Responsabilidades
-                </h3>
+            <div className="dashboard-info" style={{ marginTop: "3rem" }}>
+                <h3 style={{ marginBottom: "1rem", color: "var(--gray-900)" }}>Tus Responsabilidades</h3>
                 <ul
                     style={{
                         listStyle: "none",
@@ -209,25 +199,25 @@ export default function AsesorDashboard() {
                     }}
                 >
                     <li style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                        <span style={{ fontSize: "1.5rem" }}>✅</span>
+                        <span className="resp-ico" aria-hidden="true">{"\u2705"}</span>
                         <span style={{ color: "var(--gray-700)" }}>
                             Revisar y aprobar solicitudes en estado "En validación"
                         </span>
                     </li>
                     <li style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                        <span style={{ fontSize: "1.5rem" }}>📊</span>
+                        <span className="resp-ico" aria-hidden="true">{"\uD83D\uDCCA"}</span>
                         <span style={{ color: "var(--gray-700)" }}>
                             Asignar tasas de interés competitivas según el plazo y monto
                         </span>
                     </li>
                     <li style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                        <span style={{ fontSize: "1.5rem" }}>❌</span>
+                        <span className="resp-ico" aria-hidden="true">{"\u274C"}</span>
                         <span style={{ color: "var(--gray-700)" }}>
                             Rechazar solicitudes que no cumplan con los requisitos
                         </span>
                     </li>
                     <li style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                        <span style={{ fontSize: "1.5rem" }}>📈</span>
+                        <span className="resp-ico" aria-hidden="true">{"\uD83D\uDCC8"}</span>
                         <span style={{ color: "var(--gray-700)" }}>
                             Monitorear tendencias y generar reportes de inversión
                         </span>

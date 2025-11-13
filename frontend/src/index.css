@@ -2561,4 +2561,38 @@ body.dark-mode .form-group span[style*="position: absolute"] {
   background: linear-gradient(135deg, #616161, #757575);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(117, 117, 117, 0.3);
+}/* Dashboard info card */
+.dashboard-info {
+  background: #fff;
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+/* Dark mode */
+body.dark-mode .dashboard-info {
+  background: var(--gray-100);
+  border: 1px solid var(--gray-300);
+  color: var(--gray-900);
+}
+/* Icons for dashboard responsibilities */
+.dashboard-info .resp-ico {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--gray-200);
+  color: var(--gray-900);
+}
+body.dark-mode .dashboard-info .resp-ico {
+  background: var(--gray-200);
+  color: var(--gray-900);
+}
+/* Filters: make action button align and look like button, not full-width tile */
+.filters-grid > button {
+  justify-self: start;
+  align-self: end;
+  padding: 0.875rem 1.25rem;
 }

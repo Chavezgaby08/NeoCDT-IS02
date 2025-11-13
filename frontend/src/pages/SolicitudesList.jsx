@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getSolicitudes,
@@ -30,7 +30,7 @@ export default function SolicitudesList() {
     setLoading(true);
     try {
       const data = await getSolicitudes();
-      console.log("📋 Solicitudes recibidas:", data);
+      console.log("Solicitudes recibidas:", data);
       setSolicitudes(data);
       setFilteredSolicitudes(data);
     } catch (error) {
@@ -95,10 +95,10 @@ export default function SolicitudesList() {
         await updateSolicitud(solicitud.id, {
           estado: "EN_VALIDACION",
         });
-        console.log("✅ Solicitud enviada a validación:", solicitud.id);
+        console.log("Solicitud enviada a validación:", solicitud.id);
         loadSolicitudes();
       } catch (error) {
-        console.error("❌ Error enviando a validación:", error);
+        console.error("Error enviando a validación:", error);
         alert(error.message || "Error al enviar la solicitud");
       }
     }
@@ -114,10 +114,10 @@ export default function SolicitudesList() {
         await updateSolicitud(solicitud.id, {
           estado: "CANCELADA",
         });
-        console.log("✅ Solicitud cancelada:", solicitud.id);
+        console.log("Solicitud cancelada:", solicitud.id);
         loadSolicitudes();
       } catch (error) {
-        console.error("❌ Error cancelando solicitud:", error);
+        console.error("Error cancelando solicitud:", error);
         alert(error.message || "Error al cancelar la solicitud");
       }
     }
@@ -168,7 +168,6 @@ export default function SolicitudesList() {
     const mapeo = {
       Borrador: "BORRADOR",
       "En validación": "EN_VALIDACION",
-      Aprobada: "APROBADA",
       Rechazada: "RECHAZADA",
       Cancelada: "CANCELADA",
     };
@@ -198,7 +197,6 @@ export default function SolicitudesList() {
               <option value="Todos">Todos los estados</option>
               <option value="Borrador">Borrador</option>
               <option value="En validación">En validación</option>
-              <option value="Aprobada">Aprobada</option>
               <option value="Rechazada">Rechazada</option>
               <option value="Cancelada">Cancelada</option>
             </select>
@@ -226,7 +224,7 @@ export default function SolicitudesList() {
 
           <button
             id="filtrar-btn"
-            className="btn-filter"
+            className="btn-primary"
             onClick={handleFiltrarFechas}
           >
             Filtrar
@@ -246,11 +244,11 @@ export default function SolicitudesList() {
       ) : filteredSolicitudes.length === 0 ? (
         /* Empty State */
         <div className="empty-state">
-          <div className="empty-state-icon">📋</div>
+          <div className="empty-state-icon"></div>
           <h3>No hay solicitudes</h3>
           <p>
             {filterEstado === "Todos"
-              ? "Aún no has creado ninguna solicitud de CDT"
+              ? "No has creado ninguna solicitud de CDT"
               : `No tienes solicitudes con estado "${filterEstado}"`}
           </p>
           <button
@@ -371,7 +369,7 @@ export default function SolicitudesList() {
                     <button
                       className="btn-cancel"
                       onClick={() => handleCancelar(solicitud)}
-                      title="Cancelar solicitud en validación"
+                      title="Cancelar solicitud En validación"
                       style={{
                         background: "linear-gradient(135deg, #FF9800, #FFB74D)",
                         color: "white",
@@ -407,3 +405,4 @@ export default function SolicitudesList() {
     </div>
   );
 }
+
